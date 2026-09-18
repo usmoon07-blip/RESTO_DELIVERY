@@ -20,8 +20,8 @@ export default function App() {
     <div className="layout">
       <header className="topbar">
         <div className="topbar__logo">
-          <span>🍕</span>
-          <span>Premium Pizza</span>
+          <div className="brand-mark">Resto</div>
+          <div className="brand-mark__sub">Restaurant</div>
         </div>
 
         <nav className="tabs">

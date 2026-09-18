@@ -1,4 +1,4 @@
-# 🍕 Premium Pizza — Telegram Mini App + Admin Panel
+# 🍕 Resto — Telegram Mini App + Admin Panel
 
 Telegram bot, mijozlar uchun Mini App va ma'murlar uchun Admin Panel.
 Butunlay **localhost**da ishlaydi, hech qayerga deploy qilish shart emas.
@@ -176,7 +176,34 @@ RESTO_DELIVERY/
 
 ---
 
-## 8. Foydali maslahatlar
+## 8. Brend ranglari va shriftlari
+
+Dizayn Resto Restaurant'ning Instagram brendiga moslangan.
+
+| O'zgaruvchi | Rang | Qayerda ishlatiladi |
+|---|---|---|
+| `--accent` | `#8c7a71` | Logotip, story halqalari, urg'ular |
+| `--accent-strong` | `#6e5d55` | Tugmalar, havolalar |
+| `--price` | `#c8102e` | Chegirma narxlari, belgilar |
+| `--dark` | `#2a2422` | Asosiy tugmalar, hero bloki |
+| `--muted-bg` | `#f7f5f3` | Iliq kulrang fon |
+
+Ranglarni o'zgartirish uchun faqat 2 ta fayldagi `:root` blokini tahrirlang:
+`miniapp/src/styles.css` va `admin/src/styles.css`.
+
+**Shriftlar** (loyiha ichida saqlangan, internetsiz ham ishlaydi):
+
+| Shrift | Qayerda |
+|---|---|
+| Great Vibes | "Resto" logotipi (qo'lyozma) |
+| Playfair Display | Sarlavhalar (serif) |
+| Inter | Asosiy matn |
+
+Fayllar: `miniapp/public/fonts/` va `admin/public/fonts/`
+
+---
+
+## 9. Foydali maslahatlar
 
 - **Brauzerda test qilish:** `.env` da `ALLOW_BROWSER_DEV=true` bo'lsa,
   Mini Appni oddiy brauzerda (http://localhost:5173) ochib sinab ko'rasiz.

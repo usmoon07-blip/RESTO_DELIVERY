@@ -1,14 +1,17 @@
 :root {
-  --bg: #f7f7f8;
+  /* ---- Resto brend ranglari ---- */
+  --bg: #f8f6f4;
   --surface: #ffffff;
-  --border: #e8e8ec;
-  --text: #0a0a0b;
-  --text-2: #6e6e76;
-  --text-3: #a1a1aa;
-  --accent: #e8312a;
-  --dark: #111113;
+  --border: #ebe6e2;
+  --text: #1c1a19;
+  --text-2: #6e635c;
+  --text-3: #a79d96;
+  --accent: #8c7a71;
+  --accent-strong: #6e5d55;
+  --price: #c8102e;
+  --dark: #2a2422;
   --radius: 14px;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px rgba(42, 36, 34, 0.06);
 }
 
 * {
@@ -18,7 +21,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto,
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     sans-serif;
   background: var(--bg);
   color: var(--text);
@@ -48,6 +51,31 @@ img {
 }
 
 /* ========================= LOGIN ========================= */
+.brand-mark {
+  font-family: 'Great Vibes', 'Segoe Script', cursive;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.brand-mark__sub {
+  font-size: 8.5px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.page-title,
+.login__title,
+.kds__title,
+.modal__title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
 .login {
   min-height: 100vh;
   display: grid;
@@ -106,13 +134,15 @@ img {
 }
 
 .topbar__logo {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  justify-content: center;
   white-space: nowrap;
+  line-height: 1;
+}
+
+.topbar__logo .brand-mark {
+  font-size: 30px;
 }
 
 .tabs {
@@ -335,7 +365,7 @@ tbody tr:hover {
 }
 
 .btn--accent {
-  background: var(--accent);
+  background: var(--accent-strong);
   color: #fff;
 }
 
@@ -357,8 +387,8 @@ tbody tr:hover {
 }
 
 .btn--danger {
-  color: var(--accent);
-  background: #fff0ef;
+  color: var(--price);
+  background: #fdf2f3;
 }
 
 .input,
@@ -425,8 +455,8 @@ textarea.input {
 }
 
 .alert {
-  background: #fff0ef;
-  color: var(--accent);
+  background: #fdf2f3;
+  color: var(--price);
   border-radius: 10px;
   padding: 11px 13px;
   font-size: 13.5px;
@@ -459,6 +489,11 @@ textarea.input {
   to {
     transform: rotate(360deg);
   }
+}
+
+.kds__title .live-dot,
+.page-sub .live-dot {
+  font-family: 'Inter', sans-serif;
 }
 
 .live-dot {
@@ -673,7 +708,7 @@ textarea.input {
 }
 
 .kds-card--late {
-  border-left-color: var(--accent);
+  border-left-color: var(--price);
 }
 
 .kds-card--new {
@@ -686,7 +721,7 @@ textarea.input {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   }
   50% {
-    box-shadow: 0 0 0 4px rgba(232, 49, 42, 0.32);
+    box-shadow: 0 0 0 4px rgba(140, 122, 113, 0.45);
   }
 }
 
@@ -764,7 +799,7 @@ textarea.input {
 
 .kds-items__qty {
   font-weight: 850;
-  color: var(--accent);
+  color: var(--accent-strong);
   min-width: 34px;
 }
 
@@ -839,8 +874,8 @@ textarea.input {
 .kds-btn--ghost {
   flex: 0 0 auto;
   padding: 0 14px;
-  background: #fff0ef;
-  color: var(--accent);
+  background: #fdf2f3;
+  color: var(--price);
 }
 
 @media (max-width: 1100px) {

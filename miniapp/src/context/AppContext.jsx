@@ -27,7 +27,7 @@ export function AppProvider({ children }) {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [appConfig, setAppConfig] = useState({
-    restaurantName: 'Premium Pizza',
+    restaurantName: 'Resto',
     currency: "so'm",
     deliveryFee: 15000,
     freeDeliveryFrom: 150000,

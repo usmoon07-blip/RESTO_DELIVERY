@@ -82,6 +82,9 @@ function Shell() {
   if (success) {
     return (
       <div className="success">
+        <div className="brand-mark" style={{ marginBottom: 26 }}>
+          Resto
+        </div>
         <div className="success__icon">🎉</div>
         <div className="success__title">Buyurtma qabul qilindi!</div>
         <div className="success__text">

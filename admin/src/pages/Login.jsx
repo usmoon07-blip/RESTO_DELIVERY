@@ -25,9 +25,14 @@ export default function Login({ onSuccess }) {
   return (
     <div className="login">
       <form className="login__card" onSubmit={submit}>
-        <div className="login__logo">🍕</div>
+        <div className="login__logo">
+          <div className="brand-mark" style={{ fontSize: 52 }}>
+            Resto
+          </div>
+          <div className="brand-mark__sub">Restaurant</div>
+        </div>
         <div className="login__title">Admin Panel</div>
-        <div className="login__sub">Premium Pizza boshqaruv paneli</div>
+        <div className="login__sub">Boshqaruv paneli</div>
 
         {error && <div className="alert">{error}</div>}
 

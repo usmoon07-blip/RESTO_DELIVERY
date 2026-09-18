@@ -17,7 +17,9 @@ export default function Home({ onGoCatalog, onOpenProduct }) {
           <div className="header__hello">{greeting},</div>
           <div className="header__name">{userName} 👋</div>
         </div>
-        <div className="header__avatar">{userName.charAt(0).toUpperCase()}</div>
+        <div className="header__brand">
+          <div className="brand-mark">Resto</div>
+        </div>
       </header>
 
       <Stories />

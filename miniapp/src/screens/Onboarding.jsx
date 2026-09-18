@@ -32,9 +32,15 @@ export default function Onboarding({ onFinish }) {
 
   return (
     <div className="onboarding">
-      <button className="onboarding__skip" onClick={onFinish}>
-        {isLast ? '' : "O'tkazib yuborish"}
-      </button>
+      <div className="onboarding__top">
+        <div>
+          <div className="brand-mark">Resto</div>
+          <div className="brand-mark__sub">Restaurant</div>
+        </div>
+        <button className="onboarding__skip" onClick={onFinish}>
+          {isLast ? '' : "O'tkazib yuborish"}
+        </button>
+      </div>
 
       <div className="onboarding__visual">
         <div className="onboarding__circle" key={index}>
