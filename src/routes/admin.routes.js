@@ -22,6 +22,12 @@ router.post('/products', adminController.createProduct);
 router.put('/products/:id', adminController.updateProduct);
 router.delete('/products/:id', adminController.deleteProduct);
 
+// Promokodlar
+router.get('/promos', adminController.getPromos);
+router.post('/promos', adminController.createPromo);
+router.put('/promos/:id', adminController.updatePromo);
+router.delete('/promos/:id', adminController.deletePromo);
+
 // Mijozlar
 router.get('/users', adminController.getUsers);
 

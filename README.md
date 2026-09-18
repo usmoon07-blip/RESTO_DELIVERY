@@ -149,14 +149,56 @@ RESTO_DELIVERY/
 
 ---
 
-## 7. API yo'llari
+## 7. Mini App tuzilishi
+
+Mini App 5 ta bo'limdan iborat (pastdagi menyu):
+
+| Bo'lim | Nima bor |
+|---|---|
+| 🍽 **Menyu** | Qidiruv, manzil, storylar, aksiya bannerlari, kategoriyalar bo'yicha taomlar |
+| 🧾 **Buyurtmalar** | Xaridlar tarixi, holati va "yana buyurtma qilish" |
+| 🛍 **Savat** | Taomlar, qo'shimcha taklif, promokod, yakuniy summa |
+| ⚡ **Aksiyalar** | Promokodlar (nusxalash bilan) va chegirmadagi taomlar |
+| 👤 **Profil** | Ism, telefon, saqlangan manzil, statistika, aloqa |
+
+Qo'shimcha imkoniyatlar:
+- **Manzil xotirada saqlanadi** — keyingi buyurtmada avtomatik to'ldiriladi
+- **Kategoriyalar paneli yopishib turadi** va skroll paytida o'zi ajralib ko'rsatiladi
+- **Qidiruv** taom nomi, tarkibi va kategoriyasi bo'yicha ishlaydi
+- **Promokod** savatchada tekshiriladi, summa o'zgarsa qayta hisoblanadi
+
+---
+
+## 8. Promokodlar
+
+Promokodlar Admin Panel → **Promokodlar** bo'limida boshqariladi.
+
+| Maydon | Ma'nosi |
+|---|---|
+| Kod | Mijoz kiritadigan so'z (avtomatik katta harfga o'giriladi) |
+| Turi | Foizli (%) yoki belgilangan summa |
+| Eng kam buyurtma | Shu summadan past buyurtmalarga amal qilmaydi |
+| Eng ko'p chegirma | Foizli kodlar uchun yuqori chegara |
+| Foydalanish limiti | Necha marta ishlatish mumkin (bo'sh — cheksiz) |
+| Muddati | Shu sanadan keyin ishlamaydi |
+
+Seed bilan 3 ta promokod keladi: `RESTO10` (10%), `YANGI20` (20 000 so'm), `MEZE5` (5%).
+
+> Chegirma **serverda qayta hisoblanadi** — mijoz brauzerdan soxta summa yuborsa ham
+> haqiqiy narx bazadan olinadi.
+
+---
+
+## 9. API yo'llari
 
 ### Mijoz (`/api/client`) — Telegram initData bilan himoyalangan
 | Metod | Yo'l | Vazifasi |
 |---|---|---|
 | GET | `/config` | Sozlamalar (narx, yetkazish) |
 | GET | `/products` | Faol mahsulotlar |
-| GET | `/categories` | Kategoriyalar |
+| GET | `/categories` | Kategoriyalar (menyudagi tartibda) |
+| GET | `/promos` | Amal qilayotgan promokodlar |
+| POST | `/promo/check` | Promokodni tekshirish |
 | GET | `/me` | Profil |
 | POST | `/me/phone` | Telefonni saqlash |
 | GET | `/orders` | Mening buyurtmalarim |
@@ -172,11 +214,12 @@ RESTO_DELIVERY/
 | PATCH | `/orders/:id/status` | Holatni o'zgartirish |
 | DELETE | `/orders/:id` | O'chirish |
 | GET/POST/PUT/DELETE | `/products` | Mahsulotlar CRUD |
+| GET/POST/PUT/DELETE | `/promos` | Promokodlar CRUD |
 | GET | `/users` | Mijozlar |
 
 ---
 
-## 8. Brend ranglari va shriftlari
+## 10. Brend ranglari va shriftlari
 
 Dizayn Resto Restaurant'ning Instagram brendiga moslangan.
 
@@ -203,7 +246,7 @@ Fayllar: `miniapp/public/fonts/` va `admin/public/fonts/`
 
 ---
 
-## 9. Foydali maslahatlar
+## 11. Foydali maslahatlar
 
 - **Brauzerda test qilish:** `.env` da `ALLOW_BROWSER_DEV=true` bo'lsa,
   Mini Appni oddiy brauzerda (http://localhost:5173) ochib sinab ko'rasiz.

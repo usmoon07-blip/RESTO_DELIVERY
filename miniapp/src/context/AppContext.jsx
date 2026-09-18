@@ -11,21 +11,30 @@ import { haptic, tgUser } from '../telegram.js';
 
 const AppContext = createContext(null);
 
-const CART_KEY = 'pp_cart_v1';
+const CART_KEY = 'resto_cart_v2';
+const ADDR_KEY = 'resto_address_v1';
 
-function readCart() {
+function readJson(key, fallback) {
   try {
-    const raw = localStorage.getItem(CART_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
   } catch {
-    return [];
+    return fallback;
+  }
+}
+
+function writeJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* ignore */
   }
 }
 
 export function AppProvider({ children }) {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [promos, setPromos] = useState([]);
   const [appConfig, setAppConfig] = useState({
     restaurantName: 'Resto',
     currency: "so'm",
@@ -33,11 +42,20 @@ export function AppProvider({ children }) {
     freeDeliveryFrom: 150000,
   });
   const [profile, setProfile] = useState(null);
-  const [cart, setCart] = useState(readCart);
+  const [orders, setOrders] = useState([]);
+
+  const [cart, setCart] = useState(() => {
+    const saved = readJson(CART_KEY, []);
+    return Array.isArray(saved) ? saved : [];
+  });
+  const [address, setAddressState] = useState(() => readJson(ADDR_KEY, null));
+  const [promo, setPromo] = useState(null); // { code, discount }
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [toast, setToastState] = useState(null);
 
-  /* --------------------------- Ma'lumotlarni yuklash --------------------------- */
+  /* ------------------------------- Yuklash ------------------------------- */
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -51,11 +69,9 @@ export function AppProvider({ children }) {
       setProducts(prods);
       setCategories(cats);
 
-      try {
-        setProfile(await api.getMe());
-      } catch {
-        setProfile(null);
-      }
+      api.getPromos().then(setPromos).catch(() => setPromos([]));
+      api.getMe().then(setProfile).catch(() => setProfile(null));
+      api.getMyOrders().then(setOrders).catch(() => setOrders([]));
     } catch (e) {
       setError(e.message);
     } finally {
@@ -67,36 +83,51 @@ export function AppProvider({ children }) {
     load();
   }, [load]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    } catch {
-      /* ignore */
-    }
-  }, [cart]);
+  useEffect(() => writeJson(CART_KEY, cart), [cart]);
 
-  /* --------------------------------- Savatcha --------------------------------- */
-  const addToCart = useCallback((product, qty = 1) => {
-    haptic('light');
-    setCart((prev) => {
-      const found = prev.find((i) => i.productId === product.id);
-      if (found) {
-        return prev.map((i) =>
-          i.productId === product.id ? { ...i, qty: i.qty + qty } : i,
-        );
-      }
-      return [
-        ...prev,
-        {
-          productId: product.id,
-          name: product.name,
-          price: product.newPrice,
-          imageUrl: product.imageUrl,
-          qty,
-        },
-      ];
-    });
+  const refreshOrders = useCallback(
+    () => api.getMyOrders().then(setOrders).catch(() => {}),
+    [],
+  );
+
+  /* -------------------------------- Toast -------------------------------- */
+  const showToast = useCallback((message) => {
+    setToastState(message);
+    setTimeout(() => setToastState((cur) => (cur === message ? null : cur)), 2200);
   }, []);
+
+  /* ------------------------------- Manzil ------------------------------- */
+  const setAddress = useCallback((value) => {
+    setAddressState(value);
+    writeJson(ADDR_KEY, value);
+  }, []);
+
+  /* ------------------------------ Savatcha ------------------------------ */
+  const addToCart = useCallback(
+    (product, qty = 1, { silent = false } = {}) => {
+      haptic('light');
+      setCart((prev) => {
+        const found = prev.find((i) => i.productId === product.id);
+        if (found) {
+          return prev.map((i) =>
+            i.productId === product.id ? { ...i, qty: i.qty + qty } : i,
+          );
+        }
+        return [
+          ...prev,
+          {
+            productId: product.id,
+            name: product.name,
+            price: product.newPrice,
+            imageUrl: product.imageUrl,
+            qty,
+          },
+        ];
+      });
+      if (!silent) showToast(`${product.name} savatchaga qo'shildi`);
+    },
+    [showToast],
+  );
 
   const setQty = useCallback((productId, qty) => {
     haptic('light');
@@ -112,7 +143,10 @@ export function AppProvider({ children }) {
     setCart((prev) => prev.filter((i) => i.productId !== productId));
   }, []);
 
-  const clearCart = useCallback(() => setCart([]), []);
+  const clearCart = useCallback(() => {
+    setCart([]);
+    setPromo(null);
+  }, []);
 
   const cartCount = useMemo(
     () => cart.reduce((sum, i) => sum + i.qty, 0),
@@ -124,47 +158,102 @@ export function AppProvider({ children }) {
     [cart],
   );
 
-  const isInCart = useCallback(
-    (productId) => cart.some((i) => i.productId === productId),
+  const qtyOf = useCallback(
+    (productId) => cart.find((i) => i.productId === productId)?.qty || 0,
     [cart],
   );
+
+  /* Savatcha summasi o'zgarsa, promokodni qayta tekshiramiz */
+  useEffect(() => {
+    if (!promo) return;
+
+    if (subtotal === 0) {
+      setPromo(null);
+      return;
+    }
+
+    api
+      .checkPromo(promo.code, subtotal)
+      .then((result) =>
+        setPromo((cur) =>
+          cur && cur.code === result.code ? { ...cur, discount: result.discount } : cur,
+        ),
+      )
+      .catch(() => {
+        setPromo(null);
+        showToast('Promokod bekor qilindi');
+      });
+  }, [subtotal]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ------------------------------ Hisoblar ------------------------------ */
+  const discount = promo?.discount || 0;
+
+  const deliveryFee = useMemo(
+    () => (subtotal >= appConfig.freeDeliveryFrom ? 0 : appConfig.deliveryFee),
+    [subtotal, appConfig],
+  );
+
+  const total = Math.max(0, subtotal - discount) + deliveryFee;
 
   const value = useMemo(
     () => ({
       products,
       categories,
+      promos,
       appConfig,
       profile,
       setProfile,
+      orders,
+      refreshOrders,
       cart,
       cartCount,
       subtotal,
+      discount,
+      deliveryFee,
+      total,
+      promo,
+      setPromo,
+      address,
+      setAddress,
       loading,
       error,
       reload: load,
       addToCart,
       setQty,
+      qtyOf,
       removeFromCart,
       clearCart,
-      isInCart,
+      toast,
+      showToast,
       userName: profile?.firstName || tgUser?.first_name || 'Mehmon',
     }),
     [
       products,
       categories,
+      promos,
       appConfig,
       profile,
+      orders,
+      refreshOrders,
       cart,
       cartCount,
       subtotal,
+      discount,
+      deliveryFee,
+      total,
+      promo,
+      address,
+      setAddress,
       loading,
       error,
       load,
       addToCart,
       setQty,
+      qtyOf,
       removeFromCart,
       clearCart,
-      isInCart,
+      toast,
+      showToast,
     ],
   );
 

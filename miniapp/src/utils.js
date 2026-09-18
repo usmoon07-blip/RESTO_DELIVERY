@@ -1,10 +1,5 @@
-/** 49000 -> "49 000" */
 export function formatSum(value) {
   return (Number(value) || 0).toLocaleString('ru-RU').replace(/ /g, ' ');
-}
-
-export function formatPrice(value, currency = "so'm") {
-  return `${formatSum(value)} ${currency}`;
 }
 
 export function formatDate(value) {
@@ -26,21 +21,32 @@ export const STATUS_LABELS = {
   CANCELLED: 'Bekor qilindi',
 };
 
-export const FALLBACK_IMAGE =
-  "data:image/svg+xml;charset=utf-8," +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
-      <rect width="400" height="400" fill="#F4F4F5"/>
-      <circle cx="200" cy="200" r="110" fill="#E9E9EC"/>
-      <circle cx="165" cy="175" r="16" fill="#D9D9DE"/>
-      <circle cx="235" cy="200" r="13" fill="#D9D9DE"/>
-      <circle cx="190" cy="240" r="15" fill="#D9D9DE"/>
-    </svg>`,
-  );
+/** Kategoriya nomiga qarab belgi tanlanadi */
+const CATEGORY_EMOJI = [
+  [/мезе|старт|meze/i, '🫓'],
+  [/закус|snack/i, '🥪'],
+  [/салат|salad/i, '🥗'],
+  [/суп|çorba|corba/i, '🍲'],
+  [/тандыр|пиде|пицц|pide|pizza/i, '🔥'],
+  [/горяч|мясо|стейк|гриль|кебаб|донер/i, '🍖'],
+  [/рыб|море|fish/i, '🐟'],
+  [/паст|ризотт|pasta/i, '🍝'],
+  [/гарнир|side/i, '🍚'],
+  [/десерт|сладк|dessert/i, '🍰'],
+  [/напит|сок|чай|кофе|лимонад|drink|ichim/i, '🥤'],
+  [/завтрак|breakfast/i, '🍳'],
+  [/хлеб|выпеч|bread/i, '🥖'],
+];
 
-/** Rasm yuklanmasa — zaxira rasm */
-export function onImageError(event) {
-  if (event.currentTarget.dataset.fallback === '1') return;
-  event.currentTarget.dataset.fallback = '1';
-  event.currentTarget.src = FALLBACK_IMAGE;
+export function categoryEmoji(category = '') {
+  for (const [pattern, emoji] of CATEGORY_EMOJI) {
+    if (pattern.test(category)) return emoji;
+  }
+  return '🍽️';
+}
+
+/** Chegirma foizi */
+export function discountPercent(product) {
+  if (!product?.oldPrice || product.oldPrice <= product.newPrice) return 0;
+  return Math.round(100 - (product.newPrice / product.oldPrice) * 100);
 }

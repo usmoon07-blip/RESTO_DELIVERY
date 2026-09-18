@@ -76,6 +76,13 @@ export const api = {
     request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteProduct: (id) => request(`/products/${id}`, { method: 'DELETE' }),
 
+  getPromos: () => request('/promos'),
+  createPromo: (data) =>
+    request('/promos', { method: 'POST', body: JSON.stringify(data) }),
+  updatePromo: (id, data) =>
+    request(`/promos/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deletePromo: (id) => request(`/promos/${id}`, { method: 'DELETE' }),
+
   getUsers: () => request('/users'),
 };
 

@@ -2,6 +2,7 @@ import config from '../config/default.js';
 import ProductModel from '../models/Product.js';
 import OrderModel from '../models/Order.js';
 import UserModel from '../models/User.js';
+import PromoCodeModel, { evaluatePromo } from '../models/PromoCode.js';
 import bot, { sendMessageSafe } from '../core/bot.js';
 import {
   formatPrice,
@@ -74,6 +75,56 @@ export async function getCategories(req, res, next) {
   }
 }
 
+/** GET /api/client/promos — amal qilayotgan promokodlar ro'yxati */
+export async function getPromos(req, res, next) {
+  try {
+    const promos = await PromoCodeModel.findActive();
+    res.json({
+      ok: true,
+      data: promos.map((p) => ({
+        code: p.code,
+        description: p.description,
+        type: p.type,
+        value: p.value,
+        minOrderAmount: p.minOrderAmount,
+        maxDiscount: p.maxDiscount,
+        expiresAt: p.expiresAt,
+      })),
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/** POST /api/client/promo/check — promokodni tekshirish */
+export async function checkPromo(req, res, next) {
+  try {
+    const { code, subtotal } = req.body || {};
+
+    if (!code || !String(code).trim()) {
+      return res.status(400).json({ ok: false, error: 'Promokodni kiriting' });
+    }
+
+    const promo = await PromoCodeModel.findByCode(code);
+    const result = evaluatePromo(promo, Math.max(0, Number(subtotal) || 0));
+
+    if (!result.ok) {
+      return res.status(400).json({ ok: false, error: result.error });
+    }
+
+    res.json({
+      ok: true,
+      data: {
+        code: result.promo.code,
+        description: result.promo.description,
+        discount: result.discount,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 /** GET /api/client/orders — mening buyurtmalarim */
 export async function getMyOrders(req, res, next) {
   try {
@@ -99,6 +150,7 @@ export async function createOrder(req, res, next) {
       longitude = null,
       phone = '',
       comment = '',
+      promoCode = '',
     } = req.body || {};
 
     // --- Validatsiya ---
@@ -159,10 +211,26 @@ export async function createOrder(req, res, next) {
         .json({ ok: false, error: 'Tanlangan mahsulotlar topilmadi' });
     }
 
+    // --- Promokod (narx kabi, u ham serverda qayta tekshiriladi) ---
+    let discount = 0;
+    let appliedPromo = null;
+
+    if (String(promoCode).trim()) {
+      const promo = await PromoCodeModel.findByCode(promoCode);
+      const result = evaluatePromo(promo, subtotal);
+
+      if (!result.ok) {
+        return res.status(400).json({ ok: false, error: result.error });
+      }
+
+      discount = result.discount;
+      appliedPromo = result.promo;
+    }
+
     const { deliveryFee: fee, freeDeliveryFrom } = config.business;
     const deliveryFee =
       deliveryType === 'DELIVERY' && subtotal < freeDeliveryFrom ? fee : 0;
-    const total = subtotal + deliveryFee;
+    const total = Math.max(0, subtotal - discount) + deliveryFee;
 
     // --- Bazaga yozish ---
     const order = await OrderModel.create({
@@ -170,6 +238,8 @@ export async function createOrder(req, res, next) {
       items: orderItems,
       subtotal,
       deliveryFee,
+      discount,
+      promoCode: appliedPromo ? appliedPromo.code : null,
       total,
       deliveryType,
       paymentMethod,
@@ -179,6 +249,10 @@ export async function createOrder(req, res, next) {
       phone: cleanPhone,
       comment: String(comment).trim() || null,
     });
+
+    if (appliedPromo) {
+      await PromoCodeModel.incrementUsage(appliedPromo.id).catch(() => {});
+    }
 
     // Telefon raqamni profilga ham saqlab qo'yamiz
     if (req.user.phone !== cleanPhone) {
@@ -199,6 +273,9 @@ export async function createOrder(req, res, next) {
       itemLines,
       '',
       `<b>Mahsulotlar:</b> ${formatPrice(subtotal)}`,
+      discount > 0
+        ? `<b>Chegirma (${appliedPromo.code}):</b> −${formatPrice(discount)}`
+        : null,
       deliveryFee > 0
         ? `<b>Yetkazib berish:</b> ${formatPrice(deliveryFee)}`
         : deliveryType === 'DELIVERY'
@@ -248,6 +325,8 @@ export default {
   savePhone,
   getProducts,
   getCategories,
+  getPromos,
+  checkPromo,
   getMyOrders,
   createOrder,
 };

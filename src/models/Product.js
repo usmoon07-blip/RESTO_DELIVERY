@@ -26,14 +26,25 @@ export const ProductModel = {
     });
   },
 
+  /**
+   * Kategoriyalar menyudagi tartibda qaytariladi (alifbo bo'yicha emas):
+   * har bir kategoriyaning eng kichik sortOrder'i bo'yicha.
+   */
   async categories() {
     const rows = await prisma.product.findMany({
       where: { isActive: true },
       select: { category: true },
-      distinct: ['category'],
-      orderBy: { category: 'asc' },
+      orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
     });
-    return rows.map((r) => r.category);
+
+    const seen = new Set();
+    const ordered = [];
+    for (const row of rows) {
+      if (seen.has(row.category)) continue;
+      seen.add(row.category);
+      ordered.push(row.category);
+    }
+    return ordered;
   },
 
   create(data) {

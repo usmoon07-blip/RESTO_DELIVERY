@@ -1,6 +1,7 @@
 import ProductModel from '../models/Product.js';
 import OrderModel from '../models/Order.js';
 import UserModel from '../models/User.js';
+import PromoCodeModel from '../models/PromoCode.js';
 import { sendMessageSafe } from '../core/bot.js';
 import { formatPrice, STATUS_LABELS, STATUS_EMOJI } from '../utils/format.js';
 
@@ -189,6 +190,98 @@ export async function deleteProduct(req, res, next) {
   }
 }
 
+/* ============================ PROMOKODLAR ============================ */
+
+function normalizePromo(body = {}) {
+  const toIntOrNull = (v) => {
+    if (v === '' || v === null || v === undefined) return null;
+    const n = Number.parseInt(v, 10);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  return {
+    code: String(body.code || '').trim().toUpperCase(),
+    description: String(body.description || '').trim(),
+    type: body.type === 'FIXED' ? 'FIXED' : 'PERCENT',
+    value: toIntOrNull(body.value) ?? 0,
+    minOrderAmount: toIntOrNull(body.minOrderAmount) ?? 0,
+    maxDiscount: toIntOrNull(body.maxDiscount),
+    usageLimit: toIntOrNull(body.usageLimit),
+    expiresAt: body.expiresAt ? new Date(body.expiresAt) : null,
+    isActive: body.isActive === undefined ? true : Boolean(body.isActive),
+  };
+}
+
+/** GET /api/admin/promos */
+export async function getPromos(req, res, next) {
+  try {
+    res.json({ ok: true, data: await PromoCodeModel.findAll() });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/** POST /api/admin/promos */
+export async function createPromo(req, res, next) {
+  try {
+    const data = normalizePromo(req.body);
+
+    if (!data.code) {
+      return res.status(400).json({ ok: false, error: 'Promokodni kiriting' });
+    }
+    if (data.value <= 0) {
+      return res.status(400).json({ ok: false, error: "Chegirma qiymatini kiriting" });
+    }
+    if (data.type === 'PERCENT' && data.value > 100) {
+      return res.status(400).json({ ok: false, error: 'Foiz 100 dan oshmasligi kerak' });
+    }
+
+    res.status(201).json({ ok: true, data: await PromoCodeModel.create(data) });
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(400).json({ ok: false, error: 'Bunday promokod allaqachon bor' });
+    }
+    next(error);
+  }
+}
+
+/** PUT /api/admin/promos/:id */
+export async function updatePromo(req, res, next) {
+  try {
+    const data = normalizePromo(req.body);
+
+    if (!data.code) {
+      return res.status(400).json({ ok: false, error: 'Promokodni kiriting' });
+    }
+    if (data.value <= 0) {
+      return res.status(400).json({ ok: false, error: "Chegirma qiymatini kiriting" });
+    }
+
+    res.json({ ok: true, data: await PromoCodeModel.update(req.params.id, data) });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ ok: false, error: 'Promokod topilmadi' });
+    }
+    if (error.code === 'P2002') {
+      return res.status(400).json({ ok: false, error: 'Bunday promokod allaqachon bor' });
+    }
+    next(error);
+  }
+}
+
+/** DELETE /api/admin/promos/:id */
+export async function deletePromo(req, res, next) {
+  try {
+    await PromoCodeModel.remove(req.params.id);
+    res.json({ ok: true });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ ok: false, error: 'Promokod topilmadi' });
+    }
+    next(error);
+  }
+}
+
 /** GET /api/admin/users */
 export async function getUsers(req, res, next) {
   try {
@@ -210,5 +303,9 @@ export default {
   createProduct,
   updateProduct,
   deleteProduct,
+  getPromos,
+  createPromo,
+  updatePromo,
+  deletePromo,
   getUsers,
 };

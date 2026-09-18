@@ -3,9 +3,9 @@ import { haptic } from '../telegram.js';
 
 const SLIDES = [
   {
-    emoji: '🍕',
-    title: 'Sizni ochlik qiynayaptimi?',
-    text: 'Biz issiqqina pizzalarni tezkor yetkazamiz. Tandirdan to\'g\'ri sizning eshigingizgacha.',
+    emoji: '🫓',
+    title: 'Turk oshxonasi — eshigingizgacha',
+    text: "Mezelar, salatlar, tandirda pishirilgan pide va pizzalar. Resto Restaurant menyusi endi telefoningizda.",
   },
   {
     emoji: '⚡️',
@@ -13,9 +13,9 @@ const SLIDES = [
     text: 'Tanlang, buyurtma bering va rohatlaning. Bor-yo\'g\'i uch qadam — va dasturxon tayyor.',
   },
   {
-    emoji: '❤️',
-    title: '10,000+ odam allaqachon biz bilan',
-    text: 'Har kuni minglab mijozlar bizni tanlaydi. Endi navbat sizniki!',
+    emoji: '🛵',
+    title: '45 daqiqada yetkazamiz',
+    text: "150 000 so'mdan yuqori buyurtmalarga yetkazib berish bepul.",
   },
 ];
 
@@ -31,36 +31,36 @@ export default function Onboarding({ onFinish }) {
   };
 
   return (
-    <div className="onboarding">
-      <div className="onboarding__top">
+    <div className="onboard">
+      <div className="onboard__top">
         <div>
           <div className="brand-mark">Resto</div>
           <div className="brand-mark__sub">Restaurant</div>
         </div>
-        <button className="onboarding__skip" onClick={onFinish}>
+        <button className="onboard__skip" onClick={onFinish}>
           {isLast ? '' : "O'tkazib yuborish"}
         </button>
       </div>
 
-      <div className="onboarding__visual">
-        <div className="onboarding__circle" key={index}>
+      <div className="onboard__visual">
+        <div className="onboard__circle" key={index}>
           {slide.emoji}
         </div>
       </div>
 
-      <div className="onboarding__text" key={`t-${index}`}>
-        <h1 className="onboarding__title">{slide.title}</h1>
-        <p className="onboarding__sub">{slide.text}</p>
+      <div className="onboard__text" key={`t-${index}`}>
+        <h1 className="onboard__title">{slide.title}</h1>
+        <p className="onboard__sub">{slide.text}</p>
       </div>
 
-      <div className="onboarding__dots">
+      <div className="onboard__dots">
         {SLIDES.map((_, i) => (
-          <span key={i} className={`dot ${i === index ? 'dot--active' : ''}`} />
+          <span key={i} className={i === index ? 'on' : ''} />
         ))}
       </div>
 
-      <button className="btn btn--dark" onClick={next}>
-        {isLast ? 'Boshla' : 'Keyingisi'}
+      <button className="btn btn--brand" onClick={next}>
+        {isLast ? 'Boshlash' : 'Keyingisi'}
       </button>
     </div>
   );

@@ -36,6 +36,12 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ phone }),
     }),
+  getPromos: () => request('/client/promos'),
+  checkPromo: (code, subtotal) =>
+    request('/client/promo/check', {
+      method: 'POST',
+      body: JSON.stringify({ code, subtotal }),
+    }),
   getMyOrders: () => request('/client/orders'),
   createOrder: (order) =>
     request('/client/orders', {

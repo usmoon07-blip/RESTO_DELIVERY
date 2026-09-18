@@ -2,66 +2,73 @@ import { useEffect, useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext.jsx';
 import BottomNav from './components/BottomNav.jsx';
 import ProductSheet from './components/ProductSheet.jsx';
+import AddressSheet from './components/AddressSheet.jsx';
+import Toast from './components/Toast.jsx';
 import Onboarding from './screens/Onboarding.jsx';
-import Home from './screens/Home.jsx';
-import Catalog from './screens/Catalog.jsx';
-import Cart from './screens/Cart.jsx';
-import Checkout from './screens/Checkout.jsx';
+import Menu from './screens/Menu.jsx';
+import CartScreen from './screens/CartScreen.jsx';
+import Promos from './screens/Promos.jsx';
+import Orders from './screens/Orders.jsx';
 import Profile from './screens/Profile.jsx';
+import Checkout from './screens/Checkout.jsx';
 import { initTelegram, tg } from './telegram.js';
+import { IconCheck } from './components/Icons.jsx';
 
-const ONBOARDING_KEY = 'pp_onboarding_done';
+const ONBOARDING_KEY = 'resto_onboarding_done';
 
 function Shell() {
-  const { loading, error, reload } = useApp();
+  const { loading, error, reload, refreshOrders } = useApp();
 
   const [onboarded, setOnboarded] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) === '1',
   );
-  const [tab, setTab] = useState('home');
+  const [tab, setTab] = useState('menu');
   const [checkout, setCheckout] = useState(false);
   const [success, setSuccess] = useState(false);
   const [sheetProduct, setSheetProduct] = useState(null);
+  const [addressOpen, setAddressOpen] = useState(false);
 
-  /* Telegram "orqaga" tugmasi */
+  /* Telegramning "orqaga" tugmasi */
   useEffect(() => {
     const backButton = tg?.BackButton;
     if (!backButton) return;
 
-    const show = checkout || sheetProduct;
-
-    if (show) backButton.show();
+    const visible = checkout || sheetProduct || addressOpen;
+    if (visible) backButton.show();
     else backButton.hide();
 
     const handler = () => {
       if (sheetProduct) setSheetProduct(null);
+      else if (addressOpen) setAddressOpen(false);
       else if (checkout) setCheckout(false);
     };
 
     backButton.onClick(handler);
     return () => backButton.offClick(handler);
-  }, [checkout, sheetProduct]);
+  }, [checkout, sheetProduct, addressOpen]);
 
-  const finishOnboarding = () => {
-    localStorage.setItem(ONBOARDING_KEY, '1');
-    setOnboarded(true);
-  };
-
-  const openProduct = (product) => setSheetProduct(product);
-
-  const goTo = (nextTab) => {
+  const goTo = (next) => {
     setCheckout(false);
-    setTab(nextTab);
+    setTab(next);
     window.scrollTo({ top: 0 });
   };
 
-  if (!onboarded) return <Onboarding onFinish={finishOnboarding} />;
+  if (!onboarded) {
+    return (
+      <Onboarding
+        onFinish={() => {
+          localStorage.setItem(ONBOARDING_KEY, '1');
+          setOnboarded(true);
+        }}
+      />
+    );
+  }
 
   if (loading) {
     return (
       <div className="loader">
         <div className="spinner" />
-        <div className="muted">Yuklanmoqda...</div>
+        <div style={{ color: 'var(--ink-3)', fontSize: 14 }}>Yuklanmoqda...</div>
       </div>
     );
   }
@@ -69,10 +76,9 @@ function Shell() {
   if (error) {
     return (
       <div className="empty" style={{ paddingTop: 140 }}>
-        <div className="empty__icon">⚠️</div>
         <div className="empty__title">Ulanishda xatolik</div>
         <div className="empty__text">{error}</div>
-        <button className="btn btn--dark" onClick={reload}>
+        <button className="btn btn--brand" onClick={reload}>
           Qayta urinish
         </button>
       </div>
@@ -82,14 +88,14 @@ function Shell() {
   if (success) {
     return (
       <div className="success">
-        <div className="brand-mark" style={{ marginBottom: 26 }}>
-          Resto
+        <div className="brand-mark">Resto</div>
+        <div className="success__ico">
+          <IconCheck />
         </div>
-        <div className="success__icon">🎉</div>
         <div className="success__title">Buyurtma qabul qilindi!</div>
         <div className="success__text">
           Kuryerimiz tez orada siz bilan bog'lanadi. Tafsilotlarni botdan
-          ko'rishingiz mumkin 🍕
+          ko'rishingiz mumkin.
         </div>
       </div>
     );
@@ -103,24 +109,34 @@ function Shell() {
           onSuccess={() => {
             setCheckout(false);
             setSuccess(true);
+            refreshOrders();
           }}
         />
       ) : (
         <>
-          {tab === 'home' && (
-            <Home
-              onGoCatalog={() => goTo('catalog')}
-              onOpenProduct={openProduct}
+          {tab === 'menu' && (
+            <Menu
+              onOpenProduct={setSheetProduct}
+              onOpenAddress={() => setAddressOpen(true)}
+              onGoPromos={() => goTo('promos')}
             />
           )}
-          {tab === 'catalog' && <Catalog onOpenProduct={openProduct} />}
+          {tab === 'orders' && (
+            <Orders onGoMenu={() => goTo('menu')} onGoCart={() => goTo('cart')} />
+          )}
           {tab === 'cart' && (
-            <Cart
-              onGoCatalog={() => goTo('catalog')}
+            <CartScreen
+              onGoMenu={() => goTo('menu')}
               onCheckout={() => setCheckout(true)}
             />
           )}
-          {tab === 'profile' && <Profile onGoCart={() => goTo('cart')} />}
+          {tab === 'promos' && <Promos onOpenProduct={setSheetProduct} />}
+          {tab === 'profile' && (
+            <Profile
+              onOpenAddress={() => setAddressOpen(true)}
+              onGoOrders={() => goTo('orders')}
+            />
+          )}
 
           <BottomNav tab={tab} onChange={goTo} />
         </>
@@ -132,6 +148,10 @@ function Shell() {
           onClose={() => setSheetProduct(null)}
         />
       )}
+
+      {addressOpen && <AddressSheet onClose={() => setAddressOpen(false)} />}
+
+      <Toast />
     </div>
   );
 }

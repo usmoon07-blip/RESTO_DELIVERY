@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 import { formatSum } from '../utils.js';
 import api from '../api.js';
+import { PICKUP_ADDRESS } from '../components/AddressSheet.jsx';
 import {
   closeApp,
   getGeolocation,
@@ -9,19 +10,42 @@ import {
   requestContact,
   tg,
 } from '../telegram.js';
-
-const PICKUP_ADDRESS = "Toshkent sh., Amir Temur ko'chasi 1-uy";
+import {
+  IconBack,
+  IconPhone,
+  IconPin,
+  IconScooter,
+  IconStore,
+  IconWallet,
+} from '../components/Icons.jsx';
 
 export default function Checkout({ onBack, onSuccess }) {
-  const { cart, subtotal, appConfig, profile, clearCart } = useApp();
+  const {
+    cart,
+    subtotal,
+    discount,
+    total,
+    promo,
+    appConfig,
+    profile,
+    address,
+    setAddress,
+    clearCart,
+  } = useApp();
 
-  const [deliveryType, setDeliveryType] = useState('DELIVERY');
+  const [deliveryType, setDeliveryType] = useState(address?.mode || 'DELIVERY');
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [phone, setPhone] = useState(profile?.phone || '');
-  const [address, setAddress] = useState('');
-  const [coords, setCoords] = useState(null);
+  const [text, setText] = useState(
+    address?.mode === 'PICKUP' ? '' : address?.text || '',
+  );
+  const [coords, setCoords] = useState(
+    address?.latitude != null
+      ? { latitude: address.latitude, longitude: address.longitude }
+      : null,
+  );
   const [comment, setComment] = useState('');
-  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoBusy, setGeoBusy] = useState(false);
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
 
@@ -29,45 +53,41 @@ export default function Checkout({ onBack, onSuccess }) {
     deliveryType === 'DELIVERY' && subtotal < appConfig.freeDeliveryFrom
       ? appConfig.deliveryFee
       : 0;
-  const total = subtotal + deliveryFee;
+  const payable = Math.max(0, subtotal - discount) + deliveryFee;
 
-  /* ------------------------------ Lokatsiya ------------------------------ */
   const detectLocation = async () => {
-    setGeoLoading(true);
+    setGeoBusy(true);
     setError('');
     try {
-      const position = await getGeolocation();
-      setCoords(position);
+      setCoords(await getGeolocation());
       haptic('success');
     } catch (e) {
       setError(e.message);
       haptic('error');
     } finally {
-      setGeoLoading(false);
+      setGeoBusy(false);
     }
   };
 
-  /* ------------------------------ Telefon ------------------------------ */
-  const pickPhoneFromTelegram = async () => {
+  const pickPhone = async () => {
     const result = await requestContact();
     if (result) {
       setPhone(result);
       haptic('success');
     } else {
-      setError("Raqamni qo'lda kiriting yoki botda '📞 Raqamni yuborish' tugmasini bosing");
+      setError("Raqamni qo'lda kiriting yoki botdagi '📞 Raqamni yuborish' tugmasini bosing");
     }
   };
 
-  /* ------------------------------ Yuborish ------------------------------ */
   const submit = async () => {
     setError('');
 
     if (phone.replace(/\D/g, '').length < 9) {
-      setError('Telefon raqamingizni to\'liq kiriting');
+      setError("Telefon raqamingizni to'liq kiriting");
       return haptic('error');
     }
 
-    if (deliveryType === 'DELIVERY' && !address.trim() && !coords) {
+    if (deliveryType === 'DELIVERY' && !text.trim() && !coords) {
       setError('Manzilni kiriting yoki joylashuvni aniqlang');
       return haptic('error');
     }
@@ -78,19 +98,27 @@ export default function Checkout({ onBack, onSuccess }) {
         items: cart.map((i) => ({ productId: i.productId, qty: i.qty })),
         deliveryType,
         paymentMethod,
-        address: deliveryType === 'PICKUP' ? PICKUP_ADDRESS : address.trim(),
+        address: deliveryType === 'PICKUP' ? PICKUP_ADDRESS : text.trim(),
         latitude: coords?.latitude ?? null,
         longitude: coords?.longitude ?? null,
         phone: phone.trim(),
         comment: comment.trim(),
+        promoCode: promo?.code || '',
+      });
+
+      // Manzilni keyingi safar uchun eslab qolamiz
+      setAddress({
+        mode: deliveryType,
+        text: deliveryType === 'PICKUP' ? PICKUP_ADDRESS : text.trim(),
+        latitude: coords?.latitude ?? null,
+        longitude: coords?.longitude ?? null,
       });
 
       clearCart();
       haptic('success');
       onSuccess();
 
-      // Mini App 2.5 soniyadan so'ng yopiladi
-      setTimeout(() => closeApp(), 2500);
+      setTimeout(() => closeApp(), 2600);
     } catch (e) {
       setError(e.message);
       haptic('error');
@@ -101,62 +129,61 @@ export default function Checkout({ onBack, onSuccess }) {
 
   return (
     <div className="page">
-      <header className="header">
-        <div>
-          <button className="link-btn" onClick={onBack}>
-            ← Savatcha
-          </button>
-          <div className="header__name" style={{ marginTop: 4 }}>
-            Rasmiylashtirish
-          </div>
-        </div>
-      </header>
+      <div className="screen-head">
+        <button className="link" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <IconBack style={{ width: 16, height: 16 }} />
+          Savat
+        </button>
+        <h1 className="screen-title" style={{ marginTop: 6 }}>
+          Rasmiylashtirish
+        </h1>
+      </div>
 
-      <div className="container" style={{ paddingTop: 10 }}>
+      <div className="wrap">
         {error && <div className="alert">{error}</div>}
 
-        {/* --------- Yetkazish turi --------- */}
+        {/* --------------------------- Olish turi --------------------------- */}
         <div className="field">
           <label className="field__label">Qanday olasiz?</label>
           <div className="segment">
             <button
-              className={`segment__item ${deliveryType === 'DELIVERY' ? 'segment__item--active' : ''}`}
+              className={`seg ${deliveryType === 'DELIVERY' ? 'seg--on' : ''}`}
               onClick={() => {
                 haptic('light');
                 setDeliveryType('DELIVERY');
               }}
             >
-              <div className="segment__icon">🛵</div>
-              <div className="segment__title">Yetkazib berish</div>
-              <div className="segment__sub">30-40 daqiqa</div>
+              <IconScooter />
+              <div className="seg__title">Yetkazib berish</div>
+              <div className="seg__sub">45 daqiqa</div>
             </button>
             <button
-              className={`segment__item ${deliveryType === 'PICKUP' ? 'segment__item--active' : ''}`}
+              className={`seg ${deliveryType === 'PICKUP' ? 'seg--on' : ''}`}
               onClick={() => {
                 haptic('light');
                 setDeliveryType('PICKUP');
               }}
             >
-              <div className="segment__icon">🏃</div>
-              <div className="segment__title">Borib olish</div>
-              <div className="segment__sub">15 daqiqa</div>
+              <IconStore />
+              <div className="seg__title">Borib olish</div>
+              <div className="seg__sub">15 daqiqa</div>
             </button>
           </div>
         </div>
 
-        {/* --------- Manzil --------- */}
+        {/* ----------------------------- Manzil ----------------------------- */}
         {deliveryType === 'DELIVERY' ? (
           <>
             <div className="field">
               <label className="field__label">Yetkazib berish manzili</label>
               <button
-                className={`location-btn ${coords ? 'location-btn--done' : ''}`}
+                className={`geo ${coords ? 'geo--ok' : ''}`}
                 onClick={detectLocation}
-                disabled={geoLoading}
+                disabled={geoBusy}
               >
-                <span>📍</span>
+                <IconPin />
                 <span>
-                  {geoLoading
+                  {geoBusy
                     ? 'Aniqlanmoqda...'
                     : coords
                       ? `Joylashuv aniqlandi (${coords.latitude.toFixed(4)}, ${coords.longitude.toFixed(4)})`
@@ -169,22 +196,22 @@ export default function Checkout({ onBack, onSuccess }) {
               <textarea
                 className="input"
                 placeholder="Ko'cha, uy, xonadon, mo'ljal..."
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
               />
             </div>
           </>
         ) : (
           <div className="field">
             <label className="field__label">Olib ketish manzili</label>
-            <div className="location-btn location-btn--done">
-              <span>🏠</span>
+            <div className="geo geo--ok">
+              <IconStore />
               <span>{PICKUP_ADDRESS}</span>
             </div>
           </div>
         )}
 
-        {/* --------- Telefon --------- */}
+        {/* ----------------------------- Telefon ----------------------------- */}
         <div className="field">
           <label className="field__label">Telefon raqamingiz</label>
           <input
@@ -197,45 +224,46 @@ export default function Checkout({ onBack, onSuccess }) {
           />
           {tg?.requestContact && (
             <button
-              className="btn btn--light btn--sm"
+              className="btn btn--soft btn--sm"
               style={{ marginTop: 10 }}
-              onClick={pickPhoneFromTelegram}
+              onClick={pickPhone}
             >
-              📞 Telegramdagi raqamimni olish
+              <IconPhone style={{ width: 16, height: 16 }} />
+              Telegramdagi raqamimni olish
             </button>
           )}
         </div>
 
-        {/* --------- To'lov --------- */}
+        {/* ------------------------------ To'lov ------------------------------ */}
         <div className="field">
           <label className="field__label">To'lov turi</label>
           <div className="segment">
             <button
-              className={`segment__item ${paymentMethod === 'CASH' ? 'segment__item--active' : ''}`}
+              className={`seg ${paymentMethod === 'CASH' ? 'seg--on' : ''}`}
               onClick={() => {
                 haptic('light');
                 setPaymentMethod('CASH');
               }}
             >
-              <div className="segment__icon">💵</div>
-              <div className="segment__title">Naqd pul</div>
-              <div className="segment__sub">Kuryerga</div>
+              <IconWallet />
+              <div className="seg__title">Naqd pul</div>
+              <div className="seg__sub">Kuryerga</div>
             </button>
             <button
-              className={`segment__item ${paymentMethod === 'CARD' ? 'segment__item--active' : ''}`}
+              className={`seg ${paymentMethod === 'CARD' ? 'seg--on' : ''}`}
               onClick={() => {
                 haptic('light');
                 setPaymentMethod('CARD');
               }}
             >
-              <div className="segment__icon">💳</div>
-              <div className="segment__title">Karta orqali</div>
-              <div className="segment__sub">Terminal / Click</div>
+              <IconWallet />
+              <div className="seg__title">Karta orqali</div>
+              <div className="seg__sub">Terminal / Click</div>
             </button>
           </div>
         </div>
 
-        {/* --------- Izoh --------- */}
+        {/* ------------------------------- Izoh ------------------------------- */}
         <div className="field">
           <label className="field__label">Izoh (ixtiyoriy)</label>
           <textarea
@@ -246,34 +274,45 @@ export default function Checkout({ onBack, onSuccess }) {
           />
         </div>
 
-        {/* --------- Summa --------- */}
+        {/* ------------------------------ Summa ------------------------------ */}
         <div className="totals">
           <div className="totals__row">
-            <span>Mahsulotlar ({cart.length} xil)</span>
+            <span>Taomlar ({cart.length} xil)</span>
             <span>
               {formatSum(subtotal)} {appConfig.currency}
             </span>
           </div>
+
+          {discount > 0 && (
+            <div className="totals__row totals__row--sale">
+              <span>Chegirma ({promo.code})</span>
+              <span>
+                −{formatSum(discount)} {appConfig.currency}
+              </span>
+            </div>
+          )}
+
           <div className="totals__row">
             <span>Yetkazib berish</span>
             <span>
-              {deliveryFee === 0
-                ? deliveryType === 'PICKUP'
-                  ? '—'
-                  : 'Bepul 🎁'
-                : `${formatSum(deliveryFee)} ${appConfig.currency}`}
+              {deliveryType === 'PICKUP'
+                ? '—'
+                : deliveryFee === 0
+                  ? 'Bepul'
+                  : `${formatSum(deliveryFee)} ${appConfig.currency}`}
             </span>
           </div>
+
           <div className="totals__row totals__row--main">
             <span>Jami to'lov</span>
             <span>
-              {formatSum(total)} {appConfig.currency}
+              {formatSum(payable)} {appConfig.currency}
             </span>
           </div>
         </div>
 
         <button
-          className="btn btn--accent"
+          className="btn btn--brand"
           style={{ marginTop: 18 }}
           onClick={submit}
           disabled={sending}

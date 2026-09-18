@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
-import { formatSum, onImageError } from '../utils.js';
+import { discountPercent, formatSum } from '../utils.js';
 import { haptic } from '../telegram.js';
+import { IconMinus, IconPlus } from './Icons.jsx';
+import { Placeholder } from './ProductCard.jsx';
 
 export default function ProductSheet({ product, onClose }) {
   const { addToCart, appConfig } = useApp();
@@ -17,52 +19,57 @@ export default function ProductSheet({ product, onClose }) {
 
   if (!product) return null;
 
-  const total = product.newPrice * qty;
+  const sale = discountPercent(product);
+
+  // Tavsifning boshidagi turkcha nom (masalan "Acili Ezme — ...")
+  const [maybeSubtitle] = product.description.split(' — ');
+  const subtitle =
+    product.description.includes(' — ') && maybeSubtitle.length < 40
+      ? maybeSubtitle
+      : null;
 
   const handleAdd = () => {
-    addToCart(product, qty);
+    addToCart(product, qty, { silent: true });
     haptic('success');
     onClose();
   };
 
   return (
     <>
-      <div className="sheet-backdrop" onClick={onClose} />
+      <div className="backdrop" onClick={onClose} />
       <div className="sheet">
-        <div className="sheet__handle" />
+        <div className="sheet__grip" />
 
         <div className="sheet__scroll">
           <div className="sheet__body">
-            <img
-              className="sheet__img"
-              src={product.imageUrl}
-              alt={product.name}
-              onError={onImageError}
-            />
+            <div className="sheet__media">
+              {product.imageUrl ? (
+                <img src={product.imageUrl} alt={product.name} />
+              ) : (
+                <Placeholder />
+              )}
+            </div>
 
             <h2 className="sheet__title">{product.name}</h2>
+            {subtitle && <div className="sheet__sub">{subtitle}</div>}
 
-            <div className="card__prices" style={{ marginTop: 10 }}>
-              {product.oldPrice > product.newPrice && (
-                <span className="price-old" style={{ fontSize: 14 }}>
+            <div className="sheet__price">
+              {sale > 0 && (
+                <span className="price-old" style={{ marginRight: 8 }}>
                   {formatSum(product.oldPrice)}
                 </span>
               )}
-              <span className="price-new" style={{ fontSize: 20 }}>
+              <span className={sale > 0 ? 'price-new--sale' : ''}>
                 {formatSum(product.newPrice)} {appConfig.currency}
               </span>
             </div>
 
-            {product.description && (
-              <p className="sheet__desc">{product.description}</p>
-            )}
-
             {product.ingredients?.length > 0 && (
               <>
                 <div className="sheet__label">Tarkibi</div>
-                <ul className="ingredients">
-                  {product.ingredients.map((ing, i) => (
-                    <li key={i}>{ing}</li>
+                <ul className="ing">
+                  {product.ingredients.map((item, i) => (
+                    <li key={i}>{item}</li>
                   ))}
                 </ul>
               </>
@@ -71,14 +78,18 @@ export default function ProductSheet({ product, onClose }) {
         </div>
 
         <div className="sheet__cta">
-          <div className="qty">
-            <button onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
+          <div className="stepper stepper--lg">
+            <button onClick={() => setQty((q) => Math.max(1, q - 1))}>
+              <IconMinus />
+            </button>
             <span>{qty}</span>
-            <button onClick={() => setQty((q) => Math.min(20, q + 1))}>＋</button>
+            <button onClick={() => setQty((q) => Math.min(30, q + 1))}>
+              <IconPlus />
+            </button>
           </div>
 
-          <button className="btn btn--dark" onClick={handleAdd}>
-            Savatchaga qo'shish — {formatSum(total)}
+          <button className="btn btn--brand" onClick={handleAdd}>
+            {formatSum(product.newPrice * qty)} {appConfig.currency}
           </button>
         </div>
       </div>

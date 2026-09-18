@@ -8,6 +8,8 @@ const router = Router();
 router.get('/config', cartController.getAppConfig);
 router.get('/products', cartController.getProducts);
 router.get('/categories', cartController.getCategories);
+router.get('/promos', cartController.getPromos);
+router.post('/promo/check', cartController.checkPromo);
 
 // Himoyalangan: Telegram initData talab qilinadi
 router.get('/me', telegramAuth, cartController.getMe);

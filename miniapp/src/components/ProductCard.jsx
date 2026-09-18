@@ -1,48 +1,76 @@
 import { useApp } from '../context/AppContext.jsx';
-import { formatSum, onImageError } from '../utils.js';
+import { discountPercent, formatSum } from '../utils.js';
+import { IconDish, IconMinus, IconPlus } from './Icons.jsx';
+
+/** Surat bo'lmaganda ko'rsatiladigan brend uslubidagi o'rin bosar */
+export function Placeholder() {
+  return (
+    <div className="pcard__ph">
+      <IconDish />
+    </div>
+  );
+}
 
 export default function ProductCard({ product, onOpen }) {
-  const { addToCart, isInCart } = useApp();
-  const inCart = isInCart(product.id);
-
-  const discount =
-    product.oldPrice && product.oldPrice > product.newPrice
-      ? Math.round(100 - (product.newPrice / product.oldPrice) * 100)
-      : 0;
+  const { addToCart, setQty, qtyOf } = useApp();
+  const qty = qtyOf(product.id);
+  const sale = discountPercent(product);
 
   return (
-    <div className="card" onClick={() => onOpen(product)}>
-      <div className="card__img-wrap">
-        <img
-          className="card__img"
-          src={product.imageUrl}
-          alt={product.name}
-          loading="lazy"
-          onError={onImageError}
-        />
-        {discount > 0 && <span className="card__badge">−{discount}%</span>}
-        <button
-          className={`card__add ${inCart ? 'card__add--in' : ''}`}
-          aria-label="Savatchaga qo'shish"
-          onClick={(e) => {
-            e.stopPropagation();
-            addToCart(product);
-          }}
-        >
-          {inCart ? '✓' : '＋'}
-        </button>
+    <article className="pcard">
+      <div className="pcard__media" onClick={() => onOpen(product)}>
+        {product.imageUrl ? (
+          <img
+            className="pcard__img"
+            src={product.imageUrl}
+            alt={product.name}
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        ) : (
+          <Placeholder />
+        )}
+        {sale > 0 && <span className="pcard__badge">−{sale}%</span>}
       </div>
 
-      <div className="card__body">
-        <div className="card__name">{product.name}</div>
-        <div className="card__desc">{product.description}</div>
-        <div className="card__prices">
-          {product.oldPrice > product.newPrice && (
+      <div className="pcard__body" onClick={() => onOpen(product)}>
+        <div className="pcard__name">{product.name}</div>
+        <div className="pcard__prices">
+          {sale > 0 && (
             <span className="price-old">{formatSum(product.oldPrice)}</span>
           )}
-          <span className="price-new">{formatSum(product.newPrice)}</span>
+          <span className={`price-new ${sale > 0 ? 'price-new--sale' : ''}`}>
+            {formatSum(product.newPrice)}
+          </span>
         </div>
       </div>
-    </div>
+
+      <div className="pcard__foot">
+        {qty === 0 ? (
+          <button className="addbtn" onClick={() => addToCart(product)}>
+            <IconPlus />
+            Savatchaga
+          </button>
+        ) : (
+          <div className="stepper">
+            <button
+              onClick={() => setQty(product.id, qty - 1)}
+              aria-label="Kamaytirish"
+            >
+              <IconMinus />
+            </button>
+            <span>{qty}</span>
+            <button
+              onClick={() => setQty(product.id, qty + 1)}
+              aria-label="Ko'paytirish"
+            >
+              <IconPlus />
+            </button>
+          </div>
+        )}
+      </div>
+    </article>
   );
 }
