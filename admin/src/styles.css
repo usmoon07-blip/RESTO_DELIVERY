@@ -563,3 +563,288 @@ textarea.input {
     display: none;
   }
 }
+
+/* ========================= OSHXONA EKRANI (KDS) ========================= */
+.kds {
+  padding: 18px 20px 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.kds__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.kds__title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.kds__sound-on {
+  font-size: 13px;
+  font-weight: 650;
+  color: #15803d;
+  background: #f0fdf4;
+  padding: 7px 12px;
+  border-radius: 8px;
+}
+
+.kds__hint {
+  background: #fffbeb;
+  color: #92400e;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  margin-bottom: 14px;
+}
+
+.kds__board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.kds-col {
+  background: #f1f1f4;
+  border-radius: 16px;
+  padding: 12px;
+  min-height: 220px;
+}
+
+.kds-col__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14.5px;
+  font-weight: 750;
+  padding: 4px 6px 12px;
+}
+
+.kds-col__count {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 99px;
+  background: var(--dark);
+  color: #fff;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+}
+
+.kds-col__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kds-col__empty {
+  text-align: center;
+  padding: 34px 10px;
+  color: var(--text-3);
+  font-size: 13.5px;
+}
+
+/* --------- Buyurtma kartochkasi --------- */
+.kds-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  border-left: 5px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.kds-card--ok {
+  border-left-color: #22c55e;
+}
+
+.kds-card--warn {
+  border-left-color: #f59e0b;
+}
+
+.kds-card--late {
+  border-left-color: var(--accent);
+}
+
+.kds-card--new {
+  animation: kds-flash 1.1s ease-in-out 5;
+}
+
+@keyframes kds-flash {
+  0%,
+  100% {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(232, 49, 42, 0.32);
+  }
+}
+
+.kds-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.kds-card__id {
+  font-size: 24px;
+  font-weight: 850;
+  letter-spacing: -1px;
+}
+
+.kds-timer {
+  font-size: 13px;
+  font-weight: 750;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.kds-timer--warn {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.kds-timer--late {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.kds-card__meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.kds-tag {
+  font-size: 11.5px;
+  font-weight: 650;
+  padding: 4px 9px;
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.kds-tag--time {
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+.kds-items {
+  list-style: none;
+  border-top: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--border);
+  padding: 11px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.kds-items li {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.kds-items__qty {
+  font-weight: 850;
+  color: var(--accent);
+  min-width: 34px;
+}
+
+.kds-items__name {
+  font-weight: 650;
+}
+
+.kds-comment {
+  background: #fffbeb;
+  color: #92400e;
+  border-radius: 9px;
+  padding: 9px 11px;
+  font-size: 13px;
+  font-weight: 550;
+  margin-top: 11px;
+  line-height: 1.45;
+}
+
+.kds-card__info {
+  margin-top: 11px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.kds-card__info a {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.kds-address {
+  color: var(--text-2);
+}
+
+.kds-total {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.kds-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.kds-btn {
+  flex: 1;
+  height: 46px;
+  border-radius: 11px;
+  font-size: 14.5px;
+  font-weight: 700;
+  transition: transform 0.1s, opacity 0.15s;
+}
+
+.kds-btn:active {
+  transform: scale(0.98);
+}
+
+.kds-btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.kds-btn--main {
+  background: var(--dark);
+  color: #fff;
+}
+
+.kds-btn--ghost {
+  flex: 0 0 auto;
+  padding: 0 14px;
+  background: #fff0ef;
+  color: var(--accent);
+}
+
+@media (max-width: 1100px) {
+  .kds__board {
+    grid-template-columns: 1fr;
+  }
+}

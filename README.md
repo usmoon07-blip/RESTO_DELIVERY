@@ -70,6 +70,32 @@ cd admin && npm run dev
 
 Admin Panel: http://localhost:5174 (parol — `.env` dagi `ADMIN_PASSWORD`)
 
+Admin Panelda 3 ta bo'lim bor:
+
+| Bo'lim | Kimga | Vazifasi |
+|---|---|---|
+| 👨‍🍳 **Oshxona ekrani** | Oshpaz / operator | Zakazlar 3 ta ustunda, tovushli signal, 3 soniyada yangilanadi |
+| **Buyurtmalar** | Menejer | To'liq jadval, filtr, statistika, tushum |
+| **Mahsulotlar** | Menejer | Pizza qo'shish / tahrirlash / o'chirish |
+
+### 👨‍🍳 Oshxona ekrani qanday ishlaydi
+
+Buyurtma tushishi bilan **"Yangi buyurtmalar"** ustunida paydo bo'ladi,
+kartochka qizil rangda chaqnaydi va signal chalinadi.
+
+```
+🔔 Yangi buyurtmalar  →  👨‍🍳 Tayyorlanmoqda  →  🛵 Yo'lda / Olib ketishga tayyor  →  ✅ Yakunlandi
+```
+
+- **Tovush:** birinchi marta **"🔔 Tovushni yoqish"** tugmasini bosing
+  (brauzer qoidasi — tovush faqat bir marta bosilgandan keyin ishlaydi).
+- **To'liq ekran:** "⛶ To'liq ekran" tugmasi — planshet yoki devordagi
+  monitor uchun.
+- **Taymer:** har bir kartochkada buyurtma tushganidan beri necha daqiqa
+  o'tgani ko'rinadi. 15 daqiqadan keyin sariq, 25 daqiqadan keyin qizil.
+- Har bir tugma bosilganda **bot mijozga avtomatik xabar yuboradi**.
+- Yakunlangan va bekor qilingan buyurtmalar ekrandan o'zi yo'qoladi.
+
 ---
 
 ## 5. ngrok orqali Telegramga ulash
@@ -142,6 +168,7 @@ RESTO_DELIVERY/
 | POST | `/login` | Parolni tekshirish |
 | GET | `/stats` | Statistika |
 | GET | `/orders` | Buyurtmalar (`?status=PENDING`) |
+| GET | `/orders?active=true` | Oshxona ekrani — tugallanmagan buyurtmalar |
 | PATCH | `/orders/:id/status` | Holatni o'zgartirish |
 | DELETE | `/orders/:id` | O'chirish |
 | GET/POST/PUT/DELETE | `/products` | Mahsulotlar CRUD |

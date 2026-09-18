@@ -60,6 +60,8 @@ export const api = {
 
   getOrders: (status) =>
     request(`/orders${status ? `?status=${status}` : ''}`),
+  /** Oshxona ekrani uchun — faqat tugallanmagan buyurtmalar */
+  getActiveOrders: () => request('/orders?active=true'),
   updateOrderStatus: (id, status) =>
     request(`/orders/${id}/status`, {
       method: 'PATCH',

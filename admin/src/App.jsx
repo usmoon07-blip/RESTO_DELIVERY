@@ -2,11 +2,12 @@ import { useState } from 'react';
 import Login from './pages/Login.jsx';
 import Orders from './pages/Orders.jsx';
 import Products from './pages/Products.jsx';
+import Kitchen from './pages/Kitchen.jsx';
 import { clearPassword, getPassword } from './api.js';
 
 export default function App() {
   const [authed, setAuthed] = useState(() => Boolean(getPassword()));
-  const [page, setPage] = useState('orders');
+  const [page, setPage] = useState('kitchen');
 
   const logout = () => {
     clearPassword();
@@ -24,6 +25,12 @@ export default function App() {
         </div>
 
         <nav className="tabs">
+          <button
+            className={`tab ${page === 'kitchen' ? 'tab--active' : ''}`}
+            onClick={() => setPage('kitchen')}
+          >
+            👨‍🍳 Oshxona ekrani
+          </button>
           <button
             className={`tab ${page === 'orders' ? 'tab--active' : ''}`}
             onClick={() => setPage('orders')}
@@ -43,11 +50,9 @@ export default function App() {
         </button>
       </header>
 
-      {page === 'orders' ? (
-        <Orders onAuthError={logout} />
-      ) : (
-        <Products onAuthError={logout} />
-      )}
+      {page === 'kitchen' && <Kitchen onAuthError={logout} />}
+      {page === 'orders' && <Orders onAuthError={logout} />}
+      {page === 'products' && <Products onAuthError={logout} />}
     </div>
   );
 }

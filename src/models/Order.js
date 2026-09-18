@@ -24,11 +24,18 @@ export const OrderModel = {
     });
   },
 
-  /** Admin Panel uchun — filtrlash bilan */
-  findAll({ status, limit = 100 } = {}) {
+  /**
+   * Admin Panel uchun — filtrlash bilan.
+   * `active: true` — oshxona ekrani uchun faqat tugallanmagan buyurtmalar.
+   */
+  findAll({ status, active, limit = 100 } = {}) {
+    let where;
+    if (status) where = { status };
+    else if (active) where = { status: { notIn: ['DELIVERED', 'CANCELLED'] } };
+
     return prisma.order.findMany({
-      where: status ? { status } : undefined,
-      orderBy: { createdAt: 'desc' },
+      where,
+      orderBy: { createdAt: active ? 'asc' : 'desc' },
       take: Number(limit),
       include: { user: true },
     });

@@ -34,9 +34,10 @@ export async function getStats(req, res, next) {
 /** GET /api/admin/orders?status=PENDING */
 export async function getOrders(req, res, next) {
   try {
-    const { status, limit } = req.query;
+    const { status, limit, active } = req.query;
     const orders = await OrderModel.findAll({
       status: VALID_STATUSES.includes(status) ? status : undefined,
+      active: active === 'true',
       limit: limit || 100,
     });
     res.json({ ok: true, data: orders });
