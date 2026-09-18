@@ -31,6 +31,7 @@ export default function Checkout({ onBack, onSuccess }) {
     address,
     setAddress,
     clearCart,
+    t,
   } = useApp();
 
   const [deliveryType, setDeliveryType] = useState(address?.mode || 'DELIVERY');
@@ -75,7 +76,7 @@ export default function Checkout({ onBack, onSuccess }) {
       setPhone(result);
       haptic('success');
     } else {
-      setError("Raqamni qo'lda kiriting yoki botdagi '📞 Raqamni yuborish' tugmasini bosing");
+      setError(t('phoneManual'));
     }
   };
 
@@ -83,12 +84,12 @@ export default function Checkout({ onBack, onSuccess }) {
     setError('');
 
     if (phone.replace(/\D/g, '').length < 9) {
-      setError("Telefon raqamingizni to'liq kiriting");
+      setError(t('errPhone'));
       return haptic('error');
     }
 
     if (deliveryType === 'DELIVERY' && !text.trim() && !coords) {
-      setError('Manzilni kiriting yoki joylashuvni aniqlang');
+      setError(t('errAddress'));
       return haptic('error');
     }
 
@@ -132,10 +133,10 @@ export default function Checkout({ onBack, onSuccess }) {
       <div className="screen-head">
         <button className="link" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <IconBack style={{ width: 16, height: 16 }} />
-          Savat
+          {t('cart')}
         </button>
         <h1 className="screen-title" style={{ marginTop: 6 }}>
-          Rasmiylashtirish
+          {t('checkoutTitle')}
         </h1>
       </div>
 
@@ -144,7 +145,7 @@ export default function Checkout({ onBack, onSuccess }) {
 
         {/* --------------------------- Olish turi --------------------------- */}
         <div className="field">
-          <label className="field__label">Qanday olasiz?</label>
+          <label className="field__label">{t('howToGet')}</label>
           <div className="segment">
             <button
               className={`seg ${deliveryType === 'DELIVERY' ? 'seg--on' : ''}`}
@@ -154,8 +155,8 @@ export default function Checkout({ onBack, onSuccess }) {
               }}
             >
               <IconScooter />
-              <div className="seg__title">Yetkazib berish</div>
-              <div className="seg__sub">45 daqiqa</div>
+              <div className="seg__title">{t('delivery')}</div>
+              <div className="seg__sub">{t('min45')}</div>
             </button>
             <button
               className={`seg ${deliveryType === 'PICKUP' ? 'seg--on' : ''}`}
@@ -165,8 +166,8 @@ export default function Checkout({ onBack, onSuccess }) {
               }}
             >
               <IconStore />
-              <div className="seg__title">Borib olish</div>
-              <div className="seg__sub">15 daqiqa</div>
+              <div className="seg__title">{t('pickup')}</div>
+              <div className="seg__sub">{t('min15')}</div>
             </button>
           </div>
         </div>
@@ -175,7 +176,7 @@ export default function Checkout({ onBack, onSuccess }) {
         {deliveryType === 'DELIVERY' ? (
           <>
             <div className="field">
-              <label className="field__label">Yetkazib berish manzili</label>
+              <label className="field__label">{t('deliveryAddress')}</label>
               <button
                 className={`geo ${coords ? 'geo--ok' : ''}`}
                 onClick={detectLocation}
@@ -184,10 +185,10 @@ export default function Checkout({ onBack, onSuccess }) {
                 <IconPin />
                 <span>
                   {geoBusy
-                    ? 'Aniqlanmoqda...'
+                    ? t('detecting')
                     : coords
-                      ? `Joylashuv aniqlandi (${coords.latitude.toFixed(4)}, ${coords.longitude.toFixed(4)})`
-                      : 'Joriy joylashuvimni aniqlash'}
+                      ? `${t('locationFound')} (${coords.latitude.toFixed(4)}, ${coords.longitude.toFixed(4)})`
+                      : t('detectLocation')}
                 </span>
               </button>
             </div>
@@ -195,7 +196,7 @@ export default function Checkout({ onBack, onSuccess }) {
             <div className="field">
               <textarea
                 className="input"
-                placeholder="Ko'cha, uy, xonadon, mo'ljal..."
+                placeholder={t('addressPlaceholder')}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />
@@ -203,7 +204,7 @@ export default function Checkout({ onBack, onSuccess }) {
           </>
         ) : (
           <div className="field">
-            <label className="field__label">Olib ketish manzili</label>
+            <label className="field__label">{t('pickupAddress')}</label>
             <div className="geo geo--ok">
               <IconStore />
               <span>{PICKUP_ADDRESS}</span>
@@ -213,7 +214,7 @@ export default function Checkout({ onBack, onSuccess }) {
 
         {/* ----------------------------- Telefon ----------------------------- */}
         <div className="field">
-          <label className="field__label">Telefon raqamingiz</label>
+          <label className="field__label">{t('phoneLabel')}</label>
           <input
             className="input"
             type="tel"
@@ -229,14 +230,14 @@ export default function Checkout({ onBack, onSuccess }) {
               onClick={pickPhone}
             >
               <IconPhone style={{ width: 16, height: 16 }} />
-              Telegramdagi raqamimni olish
+              {t('phoneFromTelegram')}
             </button>
           )}
         </div>
 
         {/* ------------------------------ To'lov ------------------------------ */}
         <div className="field">
-          <label className="field__label">To'lov turi</label>
+          <label className="field__label">{t('paymentType')}</label>
           <div className="segment">
             <button
               className={`seg ${paymentMethod === 'CASH' ? 'seg--on' : ''}`}
@@ -246,8 +247,8 @@ export default function Checkout({ onBack, onSuccess }) {
               }}
             >
               <IconWallet />
-              <div className="seg__title">Naqd pul</div>
-              <div className="seg__sub">Kuryerga</div>
+              <div className="seg__title">{t('cash')}</div>
+              <div className="seg__sub">{t('toCourier')}</div>
             </button>
             <button
               className={`seg ${paymentMethod === 'CARD' ? 'seg--on' : ''}`}
@@ -257,18 +258,18 @@ export default function Checkout({ onBack, onSuccess }) {
               }}
             >
               <IconWallet />
-              <div className="seg__title">Karta orqali</div>
-              <div className="seg__sub">Terminal / Click</div>
+              <div className="seg__title">{t('card')}</div>
+              <div className="seg__sub">{t('terminal')}</div>
             </button>
           </div>
         </div>
 
         {/* ------------------------------- Izoh ------------------------------- */}
         <div className="field">
-          <label className="field__label">Izoh (ixtiyoriy)</label>
+          <label className="field__label">{t('commentLabel')}</label>
           <textarea
             className="input"
-            placeholder="Masalan: eshik qo'ng'irog'i ishlamaydi, qo'ng'iroq qiling"
+            placeholder={t('commentPlaceholder')}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
@@ -277,36 +278,38 @@ export default function Checkout({ onBack, onSuccess }) {
         {/* ------------------------------ Summa ------------------------------ */}
         <div className="totals">
           <div className="totals__row">
-            <span>Taomlar ({cart.length} xil)</span>
+            <span>{t('itemsKinds', cart.length)}</span>
             <span>
-              {formatSum(subtotal)} {appConfig.currency}
+              {formatSum(subtotal)} {t('currency')}
             </span>
           </div>
 
           {discount > 0 && (
             <div className="totals__row totals__row--sale">
-              <span>Chegirma ({promo.code})</span>
               <span>
-                −{formatSum(discount)} {appConfig.currency}
+                {t('sumDiscount')} ({promo.code})
+              </span>
+              <span>
+                −{formatSum(discount)} {t('currency')}
               </span>
             </div>
           )}
 
           <div className="totals__row">
-            <span>Yetkazib berish</span>
+            <span>{t('sumDelivery')}</span>
             <span>
               {deliveryType === 'PICKUP'
                 ? '—'
                 : deliveryFee === 0
-                  ? 'Bepul'
-                  : `${formatSum(deliveryFee)} ${appConfig.currency}`}
+                  ? t('sumFree')
+                  : `${formatSum(deliveryFee)} ${t('currency')}`}
             </span>
           </div>
 
           <div className="totals__row totals__row--main">
-            <span>Jami to'lov</span>
+            <span>{t('payTotal')}</span>
             <span>
-              {formatSum(payable)} {appConfig.currency}
+              {formatSum(payable)} {t('currency')}
             </span>
           </div>
         </div>
@@ -317,7 +320,7 @@ export default function Checkout({ onBack, onSuccess }) {
           onClick={submit}
           disabled={sending}
         >
-          {sending ? 'Yuborilmoqda...' : 'Buyurtmani tasdiqlash'}
+          {sending ? t('sending') : t('confirmOrder')}
         </button>
       </div>
     </div>

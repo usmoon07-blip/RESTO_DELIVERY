@@ -1,22 +1,47 @@
 import { PrismaClient } from '@prisma/client';
 import { MENU } from './menu.js';
+import { CATEGORIES, DISH_NAMES, INGREDIENTS, translate } from './menu-i18n.js';
 
 const prisma = new PrismaClient();
 
-/** Menyu yozuvini Product jadvaliga moslash */
+/** "Айсти 450 ml" → { base: "Айсти", suffix: " 450 ml" } */
+function splitSize(name) {
+  const match = name.match(/^(.*?)(\s+(?:450 ml|1 L))$/);
+  return match ? { base: match[1], suffix: match[2] } : { base: name, suffix: '' };
+}
+
+function describe(subtitle, ingredients) {
+  return subtitle ? `${subtitle} — ${ingredients.join(', ')}` : ingredients.join(', ');
+}
+
+/** Menyu yozuvini Product jadvaliga moslash (tarjimalari bilan) */
 function toProduct(item, index) {
-  const description = item.subtitle
-    ? `${item.subtitle} — ${item.ingredients.join(', ')}`
-    : item.ingredients.join(', ');
+  const { base, suffix } = splitSize(item.name);
+
+  const ingredientsUz = item.ingredients.map((x) => translate(INGREDIENTS, x, 'uz'));
+  const ingredientsEn = item.ingredients.map((x) => translate(INGREDIENTS, x, 'en'));
+
+  const nameUz = translate(DISH_NAMES, base, 'uz') + suffix;
+  const nameEn = translate(DISH_NAMES, base, 'en') + suffix;
 
   return {
     name: item.name,
-    description,
+    description: describe(item.subtitle, item.ingredients),
+    category: item.category,
+    ingredients: item.ingredients,
+
+    nameUz,
+    nameEn,
+    descriptionUz: describe(item.subtitle, ingredientsUz),
+    descriptionEn: describe(item.subtitle, ingredientsEn),
+    categoryUz: translate(CATEGORIES, item.category, 'uz'),
+    categoryEn: translate(CATEGORIES, item.category, 'en'),
+    ingredientsUz,
+    ingredientsEn,
+
     imageUrl: item.imageUrl || '',
     oldPrice: item.oldPrice ?? null,
     newPrice: item.price,
-    category: item.category,
-    ingredients: item.ingredients,
     isActive: true,
     sortOrder: index + 1,
   };
@@ -82,7 +107,23 @@ async function main() {
   const categories = [...new Set(MENU.map((i) => i.category))];
   for (const category of categories) {
     const count = MENU.filter((i) => i.category === category).length;
-    console.log(`     • ${category} — ${count} ta`);
+    const uz = translate(CATEGORIES, category, 'uz');
+    console.log(`     • ${category} / ${uz} — ${count} ta`);
+  }
+
+  // Tarjimasi topilmagan matnlarni ogohlantirib qo'yamiz
+  const untranslated = new Set();
+  for (const item of MENU) {
+    const { base } = splitSize(item.name);
+    if (!DISH_NAMES[base]) untranslated.add(base);
+    for (const ing of item.ingredients) {
+      if (!INGREDIENTS[ing]) untranslated.add(ing);
+    }
+    if (!CATEGORIES[item.category]) untranslated.add(item.category);
+  }
+  if (untranslated.size > 0) {
+    console.log(`\n⚠️  Tarjimasi yo'q (${untranslated.size} ta) — prisma/menu-i18n.js ga qo'shing:`);
+    [...untranslated].forEach((x) => console.log(`     • ${x}`));
   }
 
   /* ------------------------------ Promokodlar ------------------------------ */

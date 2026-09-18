@@ -42,6 +42,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ code, subtotal }),
     }),
+  saveLanguage: (language) =>
+    request('/client/me/language', {
+      method: 'POST',
+      body: JSON.stringify({ language }),
+    }),
   getMyOrders: () => request('/client/orders'),
   createOrder: (order) =>
     request('/client/orders', {

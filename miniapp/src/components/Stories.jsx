@@ -1,53 +1,18 @@
 import { useEffect, useState } from 'react';
 import { haptic } from '../telegram.js';
+import { useApp } from '../context/AppContext.jsx';
 import { IconClose } from './Icons.jsx';
 
-export const STORIES = [
-  {
-    id: 'welcome',
-    emoji: '✨',
-    label: 'Resto haqida',
-    title: 'Resto Restaurant',
-    text: "Turk va zamonaviy oshxona. Mezelardan tandirda pishirilgan pidegacha — hammasi bir joyda.",
-  },
-  {
-    id: 'meze',
-    emoji: '🫓',
-    label: 'Mezelar',
-    title: "Mezelar — 39 000 so'm",
-    text: 'Acili Ezme, Haydari, Humus, Haravat. Stolingizni haqiqiy turk taomlari bilan boshlang.',
-  },
-  {
-    id: 'tandir',
-    emoji: '🔥',
-    label: 'Tandir',
-    title: 'Tandirda pishiriladi',
-    text: "Pide va pizzalar an'anaviy tandirda pishiriladi — shuning uchun ta'mi boshqacha.",
-  },
-  {
-    id: 'promo',
-    emoji: '🎟️',
-    label: 'Promokod',
-    title: 'RESTO10',
-    text: "150 000 so'mdan yuqori buyurtmalarga 10% chegirma. Savatchada promokodni kiriting.",
-  },
-  {
-    id: 'delivery',
-    emoji: '🛵',
-    label: 'Yetkazish',
-    title: '45 daqiqada yetkazamiz',
-    text: "150 000 so'mdan yuqori buyurtmalarga yetkazib berish bepul.",
-  },
-];
+const EMOJIS = ['✨', '🫓', '🔥', '🎟️', '🛵'];
 
-export function StoryViewer({ startIndex = 0, onClose, onSeen }) {
+export function StoryViewer({ stories, startIndex = 0, onClose, onSeen }) {
   const [index, setIndex] = useState(startIndex);
-  const story = STORIES[index];
+  const story = stories[index];
 
   useEffect(() => {
-    onSeen?.(STORIES[index].id);
+    onSeen?.(stories[index].id);
     const timer = setTimeout(() => {
-      if (index < STORIES.length - 1) setIndex((i) => i + 1);
+      if (index < stories.length - 1) setIndex((i) => i + 1);
       else onClose();
     }, 5000);
     return () => clearTimeout(timer);
@@ -56,7 +21,7 @@ export function StoryViewer({ startIndex = 0, onClose, onSeen }) {
   return (
     <div className="sv">
       <div className="sv__bars">
-        {STORIES.map((s, i) => (
+        {stories.map((s, i) => (
           <div
             key={s.id}
             className={`sv__bar ${
@@ -79,7 +44,7 @@ export function StoryViewer({ startIndex = 0, onClose, onSeen }) {
         />
         <button
           onClick={() =>
-            index < STORIES.length - 1 ? setIndex((i) => i + 1) : onClose()
+            index < stories.length - 1 ? setIndex((i) => i + 1) : onClose()
           }
           aria-label="Oldinga"
         />
@@ -95,7 +60,15 @@ export function StoryViewer({ startIndex = 0, onClose, onSeen }) {
 }
 
 export default function Stories() {
+  const { t } = useApp();
   const [openIndex, setOpenIndex] = useState(null);
+
+  const stories = t('stories').map((story, i) => ({
+    ...story,
+    id: `story-${i}`,
+    emoji: EMOJIS[i] || '✨',
+  }));
+
   const [seen, setSeen] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('resto_stories_seen') || '[]');
@@ -119,7 +92,7 @@ export default function Stories() {
   return (
     <>
       <div className="rail">
-        {STORIES.map((story, i) => (
+        {stories.map((story, i) => (
           <button
             key={story.id}
             className={`story ${seen.includes(story.id) ? 'story--seen' : ''}`}
@@ -138,6 +111,7 @@ export default function Stories() {
 
       {openIndex !== null && (
         <StoryViewer
+          stories={stories}
           startIndex={openIndex}
           onClose={() => setOpenIndex(null)}
           onSeen={markSeen}

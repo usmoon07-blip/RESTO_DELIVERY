@@ -2022,3 +2022,43 @@ a.row {
   line-height: 1.55;
   max-width: 300px;
 }
+
+/* ============================== TIL TANLASH ============================== */
+.langs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.lang {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 6px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fff;
+  transition: all 0.18s;
+}
+
+.lang__flag {
+  font-size: 21px;
+  line-height: 1;
+}
+
+.lang__label {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink-2);
+}
+
+.lang--on {
+  border-color: var(--brand-deep);
+  background: var(--brand-deep);
+}
+
+.lang--on .lang__label {
+  color: #fff;
+}

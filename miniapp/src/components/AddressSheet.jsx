@@ -6,7 +6,7 @@ import { IconCheck, IconPin, IconScooter, IconStore } from './Icons.jsx';
 export const PICKUP_ADDRESS = "Toshkent sh., Amir Temur ko'chasi 1-uy";
 
 export default function AddressSheet({ onClose }) {
-  const { address, setAddress, showToast } = useApp();
+  const { address, setAddress, showToast, t } = useApp();
 
   const [mode, setMode] = useState(address?.mode || 'DELIVERY');
   const [text, setText] = useState(address?.text || '');
@@ -42,7 +42,7 @@ export default function AddressSheet({ onClose }) {
 
   const save = () => {
     if (mode === 'DELIVERY' && !text.trim() && !coords) {
-      setError('Manzilni kiriting yoki joylashuvni aniqlang');
+      setError(t('errAddress'));
       return haptic('error');
     }
 
@@ -54,7 +54,7 @@ export default function AddressSheet({ onClose }) {
     });
 
     haptic('success');
-    showToast('Manzil saqlandi');
+    showToast(t('addressSaved'));
     onClose();
   };
 
@@ -66,9 +66,9 @@ export default function AddressSheet({ onClose }) {
 
         <div className="sheet__scroll">
           <div className="sheet__body">
-            <h2 className="sheet__title">Manzil</h2>
+            <h2 className="sheet__title">{t('addressTitle')}</h2>
             <p className="sheet__sub" style={{ color: 'var(--ink-3)', fontWeight: 400 }}>
-              Buyurtmani qanday olishni tanlang
+              {t('addressSub')}
             </p>
 
             {error && (
@@ -83,16 +83,16 @@ export default function AddressSheet({ onClose }) {
                 onClick={() => setMode('DELIVERY')}
               >
                 <IconScooter />
-                <div className="seg__title">Yetkazib berish</div>
-                <div className="seg__sub">45 daqiqa</div>
+                <div className="seg__title">{t('delivery')}</div>
+                <div className="seg__sub">{t('min45')}</div>
               </button>
               <button
                 className={`seg ${mode === 'PICKUP' ? 'seg--on' : ''}`}
                 onClick={() => setMode('PICKUP')}
               >
                 <IconStore />
-                <div className="seg__title">Borib olish</div>
-                <div className="seg__sub">15 daqiqa</div>
+                <div className="seg__title">{t('pickup')}</div>
+                <div className="seg__sub">{t('min15')}</div>
               </button>
             </div>
 
@@ -106,18 +106,18 @@ export default function AddressSheet({ onClose }) {
                   <IconPin />
                   <span>
                     {busy
-                      ? 'Aniqlanmoqda...'
+                      ? t('detecting')
                       : coords
-                        ? `Joylashuv aniqlandi (${coords.latitude.toFixed(4)}, ${coords.longitude.toFixed(4)})`
-                        : 'Joriy joylashuvimni aniqlash'}
+                        ? `${t('locationFound')} (${coords.latitude.toFixed(4)}, ${coords.longitude.toFixed(4)})`
+                        : t('detectLocation')}
                   </span>
                 </button>
 
                 <div className="field" style={{ marginTop: 14 }}>
-                  <label className="field__label">Manzil</label>
+                  <label className="field__label">{t('address')}</label>
                   <textarea
                     className="input"
-                    placeholder="Ko'cha, uy, xonadon, mo'ljal..."
+                    placeholder={t('addressPlaceholder')}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                   />
@@ -135,7 +135,7 @@ export default function AddressSheet({ onClose }) {
         <div className="sheet__cta">
           <button className="btn btn--brand" onClick={save}>
             <IconCheck />
-            Saqlash
+            {t('save')}
           </button>
         </div>
       </div>

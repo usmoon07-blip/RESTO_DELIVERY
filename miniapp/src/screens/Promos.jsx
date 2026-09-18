@@ -6,7 +6,7 @@ import { haptic } from '../telegram.js';
 import { IconCopy, IconSpark, IconTicket } from '../components/Icons.jsx';
 
 export default function Promos({ onOpenProduct }) {
-  const { promos, products, appConfig, showToast } = useApp();
+  const { promos, products, showToast, t } = useApp();
   const [copied, setCopied] = useState(null);
 
   const sales = useMemo(
@@ -22,20 +22,20 @@ export default function Promos({ onOpenProduct }) {
       /* clipboard mavjud bo'lmasa ham davom etamiz */
     }
     setCopied(code);
-    showToast(`${code} nusxalandi`);
+    showToast(t('copiedToast', code));
     setTimeout(() => setCopied((c) => (c === code ? null : c)), 2000);
   };
 
   const promoValue = (promo) =>
     promo.type === 'PERCENT'
-      ? `${promo.value}% chegirma`
-      : `${formatSum(promo.value)} ${appConfig.currency} chegirma`;
+      ? t('discountPercent', promo.value)
+      : t('discountFixed', formatSum(promo.value), t('currency'));
 
   return (
     <div className="page">
       <div className="screen-head">
-        <h1 className="screen-title">Aksiyalar</h1>
-        <div className="screen-sub">Promokodlar va chegirmadagi taomlar</div>
+        <h1 className="screen-title">{t('promos')}</h1>
+        <div className="screen-sub">{t('promosSub')}</div>
       </div>
 
       <div className="wrap">
@@ -44,10 +44,8 @@ export default function Promos({ onOpenProduct }) {
             <div className="empty__ico">
               <IconSpark />
             </div>
-            <div className="empty__title">Hozircha aksiya yo'q</div>
-            <div className="empty__text">
-              Yangi takliflar tez orada shu yerda paydo bo'ladi
-            </div>
+            <div className="empty__title">{t('noPromos')}</div>
+            <div className="empty__text">{t('noPromosText')}</div>
           </div>
         ) : (
           promos.map((promo, index) => (
@@ -77,10 +75,10 @@ export default function Promos({ onOpenProduct }) {
 
               <div className="promo-card__min">
                 {copied === promo.code
-                  ? '✓ Nusxalandi — savatchada qo\'llang'
+                  ? t('copied')
                   : promo.minOrderAmount > 0
-                    ? `${formatSum(promo.minOrderAmount)} ${appConfig.currency} dan yuqori buyurtmalarga`
-                    : 'Har qanday buyurtmaga amal qiladi'}
+                    ? t('minOrder', formatSum(promo.minOrderAmount), t('currency'))
+                    : t('anyOrder')}
               </div>
             </div>
           ))
@@ -90,8 +88,8 @@ export default function Promos({ onOpenProduct }) {
       {sales.length > 0 && (
         <section className="section">
           <div className="section-head">
-            <h2 className="section-head__title">Chegirmadagi taomlar</h2>
-            <span className="section-head__count">{sales.length} ta</span>
+            <h2 className="section-head__title">{t('salesTitle')}</h2>
+            <span className="section-head__count">{t('itemCount', sales.length)}</span>
           </div>
           <div className="grid">
             {sales.map((product) => (

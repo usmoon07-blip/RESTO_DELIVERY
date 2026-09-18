@@ -4,7 +4,15 @@ import { formatSum, onImageError } from '../utils.js';
 
 const EMPTY = {
   name: '',
+  nameUz: '',
+  nameEn: '',
   description: '',
+  descriptionUz: '',
+  descriptionEn: '',
+  categoryUz: '',
+  categoryEn: '',
+  ingredientsUz: '',
+  ingredientsEn: '',
   imageUrl: '',
   oldPrice: '',
   newPrice: '',
@@ -19,8 +27,14 @@ function ProductModal({ product, onClose, onSaved }) {
     product
       ? {
           ...product,
+          nameUz: product.nameUz ?? '',
+          nameEn: product.nameEn ?? '',
+          categoryUz: product.categoryUz ?? '',
+          categoryEn: product.categoryEn ?? '',
           oldPrice: product.oldPrice ?? '',
           ingredients: (product.ingredients || []).join('\n'),
+          ingredientsUz: (product.ingredientsUz || []).join('\n'),
+          ingredientsEn: (product.ingredientsEn || []).join('\n'),
         }
       : EMPTY,
   );
@@ -40,7 +54,15 @@ function ProductModal({ product, onClose, onSaved }) {
     try {
       const payload = {
         name: form.name,
+        nameUz: form.nameUz,
+        nameEn: form.nameEn,
         description: form.description,
+        descriptionUz: form.descriptionUz,
+        descriptionEn: form.descriptionEn,
+        categoryUz: form.categoryUz,
+        categoryEn: form.categoryEn,
+        ingredientsUz: form.ingredientsUz,
+        ingredientsEn: form.ingredientsEn,
         imageUrl: form.imageUrl,
         oldPrice: form.oldPrice === '' ? null : Number(form.oldPrice),
         newPrice: Number(form.newPrice),
@@ -80,14 +102,35 @@ function ProductModal({ product, onClose, onSaved }) {
         {error && <div className="alert">{error}</div>}
 
         <div className="field">
-          <label className="field__label">Nomi *</label>
+          <label className="field__label">Nomi (ruscha, asosiy) *</label>
           <input
             className="input"
             value={form.name}
             onChange={set('name')}
-            placeholder="Margarita"
+            placeholder="Хумус"
             required
           />
+        </div>
+
+        <div className="row-2">
+          <div className="field">
+            <label className="field__label">Nomi (o'zbekcha)</label>
+            <input
+              className="input"
+              value={form.nameUz}
+              onChange={set('nameUz')}
+              placeholder="Hummus"
+            />
+          </div>
+          <div className="field">
+            <label className="field__label">Nomi (inglizcha)</label>
+            <input
+              className="input"
+              value={form.nameEn}
+              onChange={set('nameEn')}
+              placeholder="Hummus"
+            />
+          </div>
         </div>
 
         <div className="field">
@@ -157,14 +200,60 @@ function ProductModal({ product, onClose, onSaved }) {
 
         <div className="field">
           <label className="field__label">
-            Tarkibi (har birini yangi qatordan yozing)
+            Tarkibi — ruscha (har birini yangi qatordan)
           </label>
           <textarea
             className="input"
             value={form.ingredients}
             onChange={set('ingredients')}
-            placeholder={'Pomidor sousi\nMozzarella\nRayhon'}
+            placeholder={'Нут\nТахина\nЧеснок'}
           />
+        </div>
+
+        <div className="row-2">
+          <div className="field">
+            <label className="field__label">Tarkibi — o'zbekcha</label>
+            <textarea
+              className="input"
+              value={form.ingredientsUz}
+              onChange={set('ingredientsUz')}
+              placeholder={"No'xat\nTahina\nSarimsoq"}
+            />
+          </div>
+          <div className="field">
+            <label className="field__label">Tarkibi — inglizcha</label>
+            <textarea
+              className="input"
+              value={form.ingredientsEn}
+              onChange={set('ingredientsEn')}
+              placeholder={'Chickpeas\nTahini\nGarlic'}
+            />
+          </div>
+        </div>
+
+        <div className="row-2">
+          <div className="field">
+            <label className="field__label">Kategoriya (o'zbekcha)</label>
+            <input
+              className="input"
+              value={form.categoryUz}
+              onChange={set('categoryUz')}
+              placeholder="Mezelar"
+            />
+          </div>
+          <div className="field">
+            <label className="field__label">Kategoriya (inglizcha)</label>
+            <input
+              className="input"
+              value={form.categoryEn}
+              onChange={set('categoryEn')}
+              placeholder="Meze & Starters"
+            />
+          </div>
+        </div>
+
+        <div className="alert" style={{ background: '#f7f5f3', color: 'var(--text-2)' }}>
+          Tarjima maydonlari bo'sh qoldirilsa, mijozga ruscha varianti ko'rsatiladi.
         </div>
 
         <div className="field">

@@ -17,7 +17,7 @@ import { IconCheck } from './components/Icons.jsx';
 const ONBOARDING_KEY = 'resto_onboarding_done';
 
 function Shell() {
-  const { loading, error, reload, refreshOrders } = useApp();
+  const { loading, error, reload, refreshOrders, t } = useApp();
 
   const [onboarded, setOnboarded] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) === '1',
@@ -68,7 +68,7 @@ function Shell() {
     return (
       <div className="loader">
         <div className="spinner" />
-        <div style={{ color: 'var(--ink-3)', fontSize: 14 }}>Yuklanmoqda...</div>
+        <div style={{ color: 'var(--ink-3)', fontSize: 14 }}>{t('loading')}</div>
       </div>
     );
   }
@@ -76,10 +76,10 @@ function Shell() {
   if (error) {
     return (
       <div className="empty" style={{ paddingTop: 140 }}>
-        <div className="empty__title">Ulanishda xatolik</div>
+        <div className="empty__title">{t('errorTitle')}</div>
         <div className="empty__text">{error}</div>
         <button className="btn btn--brand" onClick={reload}>
-          Qayta urinish
+          {t('retry')}
         </button>
       </div>
     );
@@ -92,11 +92,8 @@ function Shell() {
         <div className="success__ico">
           <IconCheck />
         </div>
-        <div className="success__title">Buyurtma qabul qilindi!</div>
-        <div className="success__text">
-          Kuryerimiz tez orada siz bilan bog'lanadi. Tafsilotlarni botdan
-          ko'rishingiz mumkin.
-        </div>
+        <div className="success__title">{t('successTitle')}</div>
+        <div className="success__text">{t('successText')}</div>
       </div>
     );
   }

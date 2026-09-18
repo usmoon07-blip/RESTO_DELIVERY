@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import config from '../config/default.js';
 import UserModel from '../models/User.js';
+import { detectLanguage, t } from '../i18n/index.js';
 
 /**
  * Telegram WebApp initData ni imzo bo'yicha tekshiradi.
@@ -74,9 +75,8 @@ export async function telegramAuth(req, res, next) {
     }
 
     if (!tgUser) {
-      return res
-        .status(401)
-        .json({ ok: false, error: "Avtorizatsiya xatosi. Ilovani Telegram orqali oching." });
+      const lang = detectLanguage(req.header('x-lang') || req.query.lang);
+      return res.status(401).json({ ok: false, error: t(lang, 'errAuth') });
     }
 
     req.tgUser = tgUser;

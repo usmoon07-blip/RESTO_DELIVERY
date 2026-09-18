@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useApp } from '../context/AppContext.jsx';
-import { formatDate, formatSum, STATUS_LABELS } from '../utils.js';
+import { formatDate, formatSum } from '../utils.js';
 import { haptic } from '../telegram.js';
 import { IconReceipt } from '../components/Icons.jsx';
 
@@ -13,6 +13,7 @@ export default function Orders({ onGoMenu, onGoCart }) {
     addToCart,
     clearCart,
     showToast,
+    t,
   } = useApp();
 
   useEffect(() => {
@@ -33,20 +34,20 @@ export default function Orders({ onGoMenu, onGoCart }) {
     }
 
     if (added === 0) {
-      showToast('Bu taomlar hozir menyuda yo\'q');
+      showToast(t('reorderMissing'));
       return;
     }
 
-    showToast('Savatchaga qo\'shildi');
+    showToast(t('reorderDone'));
     onGoCart();
   };
 
   return (
     <div className="page">
       <div className="screen-head">
-        <h1 className="screen-title">Buyurtmalar</h1>
+        <h1 className="screen-title">{t('orders')}</h1>
         <div className="screen-sub">
-          {orders.length > 0 ? `${orders.length} ta buyurtma` : 'Xaridlar tarixi'}
+          {orders.length > 0 ? t('ordersCount', orders.length) : t('ordersHistory')}
         </div>
       </div>
 
@@ -56,12 +57,10 @@ export default function Orders({ onGoMenu, onGoCart }) {
             <div className="empty__ico">
               <IconReceipt />
             </div>
-            <div className="empty__title">Buyurtmalar yo'q</div>
-            <div className="empty__text">
-              Birinchi buyurtmangizni bering — tarix shu yerda saqlanadi
-            </div>
+            <div className="empty__title">{t('noOrders')}</div>
+            <div className="empty__text">{t('noOrdersText')}</div>
             <button className="btn btn--brand" onClick={onGoMenu}>
-              Menyuni ochish
+              {t('openMenu')}
             </button>
           </div>
         ) : (
@@ -69,11 +68,11 @@ export default function Orders({ onGoMenu, onGoCart }) {
             <div className="ocard" key={order.id}>
               <div className="ocard__top">
                 <div>
-                  <div className="ocard__id">Buyurtma #{order.id}</div>
+                  <div className="ocard__id">{t('orderNo', order.id)}</div>
                   <div className="ocard__date">{formatDate(order.createdAt)}</div>
                 </div>
                 <span className={`badge badge--${order.status}`}>
-                  {STATUS_LABELS[order.status]}
+                  {t('status')[order.status]}
                 </span>
               </div>
 
@@ -85,10 +84,10 @@ export default function Orders({ onGoMenu, onGoCart }) {
 
               <div className="ocard__bot">
                 <div className="ocard__total">
-                  {formatSum(order.total)} {appConfig.currency}
+                  {formatSum(order.total)} {t('currency')}
                 </div>
                 <button className="link" onClick={() => reorder(order)}>
-                  Yana buyurtma qilish
+                  {t('reorder')}
                 </button>
               </div>
             </div>

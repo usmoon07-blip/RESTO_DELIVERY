@@ -4,15 +4,19 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
+import { productName } from '../i18n.js';
 import api from '../api.js';
 import { haptic, tgUser } from '../telegram.js';
+import { detectLang, makeT } from '../i18n.js';
 
 const AppContext = createContext(null);
 
 const CART_KEY = 'resto_cart_v2';
 const ADDR_KEY = 'resto_address_v1';
+const LANG_KEY = 'resto_lang';
 
 function readJson(key, fallback) {
   try {
@@ -32,6 +36,9 @@ function writeJson(key, value) {
 }
 
 export function AppProvider({ children }) {
+  /** Savatchada saqlanadigan nom — joriy tilda */
+  const productLabel = (product) => productName(product, langRef.current || 'UZ');
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [promos, setPromos] = useState([]);
@@ -49,6 +56,16 @@ export function AppProvider({ children }) {
     return Array.isArray(saved) ? saved : [];
   });
   const [address, setAddressState] = useState(() => readJson(ADDR_KEY, null));
+
+  const [lang, setLangState] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LANG_KEY);
+      if (saved) return saved;
+    } catch {
+      /* ignore */
+    }
+    return detectLang(tgUser?.language_code);
+  });
   const [promo, setPromo] = useState(null); // { code, discount }
 
   const [loading, setLoading] = useState(true);
@@ -70,7 +87,20 @@ export function AppProvider({ children }) {
       setCategories(cats);
 
       api.getPromos().then(setPromos).catch(() => setPromos([]));
-      api.getMe().then(setProfile).catch(() => setProfile(null));
+      api
+        .getMe()
+        .then((me) => {
+          setProfile(me);
+          // Foydalanuvchi ilgari til tanlagan bo'lsa, serverdagisi ustun turadi
+          try {
+            if (me?.language && !localStorage.getItem(LANG_KEY)) {
+              setLangState(me.language);
+            }
+          } catch {
+            setLangState(me?.language || 'UZ');
+          }
+        })
+        .catch(() => setProfile(null));
       api.getMyOrders().then(setOrders).catch(() => setOrders([]));
     } catch (e) {
       setError(e.message);
@@ -91,9 +121,28 @@ export function AppProvider({ children }) {
   );
 
   /* -------------------------------- Toast -------------------------------- */
+  // addToCart ichida eng so'nggi til va tarjimadan foydalanish uchun
+  const tRef = useRef(null);
+  const langRef = useRef('UZ');
+
   const showToast = useCallback((message) => {
     setToastState(message);
     setTimeout(() => setToastState((cur) => (cur === message ? null : cur)), 2200);
+  }, []);
+
+  /* --------------------------------- Til --------------------------------- */
+  const t = useMemo(() => makeT(lang), [lang]);
+
+  const setLang = useCallback((code) => {
+    setLangState(code);
+    try {
+      localStorage.setItem(LANG_KEY, code);
+    } catch {
+      /* ignore */
+    }
+    // Bot ham shu tilda javob berishi uchun serverga saqlaymiz
+    api.saveLanguage(code).catch(() => {});
+    setProfile((prev) => (prev ? { ...prev, language: code } : prev));
   }, []);
 
   /* ------------------------------- Manzil ------------------------------- */
@@ -117,14 +166,14 @@ export function AppProvider({ children }) {
           ...prev,
           {
             productId: product.id,
-            name: product.name,
+            name: productLabel(product),
             price: product.newPrice,
             imageUrl: product.imageUrl,
             qty,
           },
         ];
       });
-      if (!silent) showToast(`${product.name} savatchaga qo'shildi`);
+      if (!silent) showToast(tRef.current('addedToCart', productLabel(product)));
     },
     [showToast],
   );
@@ -181,7 +230,7 @@ export function AppProvider({ children }) {
       )
       .catch(() => {
         setPromo(null);
-        showToast('Promokod bekor qilindi');
+        showToast(tRef.current('promoCancelled'));
       });
   }, [subtotal]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -195,8 +244,14 @@ export function AppProvider({ children }) {
 
   const total = Math.max(0, subtotal - discount) + deliveryFee;
 
+  tRef.current = t;
+  langRef.current = lang;
+
   const value = useMemo(
     () => ({
+      lang,
+      setLang,
+      t,
       products,
       categories,
       promos,
@@ -225,9 +280,12 @@ export function AppProvider({ children }) {
       clearCart,
       toast,
       showToast,
-      userName: profile?.firstName || tgUser?.first_name || 'Mehmon',
+      userName: profile?.firstName || tgUser?.first_name || 'Guest',
     }),
     [
+      lang,
+      setLang,
+      t,
       products,
       categories,
       promos,

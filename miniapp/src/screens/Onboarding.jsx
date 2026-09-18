@@ -1,28 +1,15 @@
 import { useState } from 'react';
 import { haptic } from '../telegram.js';
+import { useApp } from '../context/AppContext.jsx';
 
-const SLIDES = [
-  {
-    emoji: '🫓',
-    title: 'Turk oshxonasi — eshigingizgacha',
-    text: "Mezelar, salatlar, tandirda pishirilgan pide va pizzalar. Resto Restaurant menyusi endi telefoningizda.",
-  },
-  {
-    emoji: '⚡️',
-    title: 'Bu qanday ishlaydi?',
-    text: 'Tanlang, buyurtma bering va rohatlaning. Bor-yo\'g\'i uch qadam — va dasturxon tayyor.',
-  },
-  {
-    emoji: '🛵',
-    title: '45 daqiqada yetkazamiz',
-    text: "150 000 so'mdan yuqori buyurtmalarga yetkazib berish bepul.",
-  },
-];
+const EMOJIS = ['🫓', '⚡️', '🛵'];
 
 export default function Onboarding({ onFinish }) {
+  const { t } = useApp();
   const [index, setIndex] = useState(0);
-  const isLast = index === SLIDES.length - 1;
-  const slide = SLIDES[index];
+  const slides = t('onboard');
+  const isLast = index === slides.length - 1;
+  const slide = slides[index];
 
   const next = () => {
     haptic('light');
@@ -38,13 +25,13 @@ export default function Onboarding({ onFinish }) {
           <div className="brand-mark__sub">Restaurant</div>
         </div>
         <button className="onboard__skip" onClick={onFinish}>
-          {isLast ? '' : "O'tkazib yuborish"}
+          {isLast ? '' : t('skip')}
         </button>
       </div>
 
       <div className="onboard__visual">
         <div className="onboard__circle" key={index}>
-          {slide.emoji}
+          {EMOJIS[index]}
         </div>
       </div>
 
@@ -54,13 +41,13 @@ export default function Onboarding({ onFinish }) {
       </div>
 
       <div className="onboard__dots">
-        {SLIDES.map((_, i) => (
+        {slides.map((_, i) => (
           <span key={i} className={i === index ? 'on' : ''} />
         ))}
       </div>
 
       <button className="btn btn--brand" onClick={next}>
-        {isLast ? 'Boshlash' : 'Keyingisi'}
+        {isLast ? t('start') : t('next')}
       </button>
     </div>
   );

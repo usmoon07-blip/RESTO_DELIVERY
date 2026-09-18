@@ -1,5 +1,6 @@
 import { useApp } from '../context/AppContext.jsx';
 import { discountPercent, formatSum } from '../utils.js';
+import { productName } from '../i18n.js';
 import { IconDish, IconMinus, IconPlus } from './Icons.jsx';
 
 /** Surat bo'lmaganda ko'rsatiladigan brend uslubidagi o'rin bosar */
@@ -12,9 +13,10 @@ export function Placeholder() {
 }
 
 export default function ProductCard({ product, onOpen }) {
-  const { addToCart, setQty, qtyOf } = useApp();
+  const { addToCart, setQty, qtyOf, lang, t } = useApp();
   const qty = qtyOf(product.id);
   const sale = discountPercent(product);
+  const name = productName(product, lang);
 
   return (
     <article className="pcard">
@@ -23,7 +25,7 @@ export default function ProductCard({ product, onOpen }) {
           <img
             className="pcard__img"
             src={product.imageUrl}
-            alt={product.name}
+            alt={name}
             loading="lazy"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
@@ -36,7 +38,7 @@ export default function ProductCard({ product, onOpen }) {
       </div>
 
       <div className="pcard__body" onClick={() => onOpen(product)}>
-        <div className="pcard__name">{product.name}</div>
+        <div className="pcard__name">{name}</div>
         <div className="pcard__prices">
           {sale > 0 && (
             <span className="price-old">{formatSum(product.oldPrice)}</span>
@@ -51,21 +53,15 @@ export default function ProductCard({ product, onOpen }) {
         {qty === 0 ? (
           <button className="addbtn" onClick={() => addToCart(product)}>
             <IconPlus />
-            Savatchaga
+            {t('addToCart')}
           </button>
         ) : (
           <div className="stepper">
-            <button
-              onClick={() => setQty(product.id, qty - 1)}
-              aria-label="Kamaytirish"
-            >
+            <button onClick={() => setQty(product.id, qty - 1)} aria-label="−">
               <IconMinus />
             </button>
             <span>{qty}</span>
-            <button
-              onClick={() => setQty(product.id, qty + 1)}
-              aria-label="Ko'paytirish"
-            >
+            <button onClick={() => setQty(product.id, qty + 1)} aria-label="+">
               <IconPlus />
             </button>
           </div>

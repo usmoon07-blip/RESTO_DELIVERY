@@ -17,6 +17,7 @@ model User {
   username     String?
   phone        String?
   languageCode String?
+  language     Language @default(UZ)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -27,18 +28,31 @@ model User {
 
 /// Mahsulotlar (pizza, ichimlik va h.k.)
 model Product {
-  id          Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
+  /// Asosiy (ruscha) matnlar — menyudagidek
   name        String
   description String   @default("")
-  imageUrl    String   @default("")
-  oldPrice    Int?
-  newPrice    Int
   category    String   @default("Pizza")
   ingredients String[] @default([])
-  isActive    Boolean  @default(true)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  /// Tarjimalar. Bo'sh bo'lsa ruscha varianti ko'rsatiladi.
+  nameUz        String?
+  nameEn        String?
+  descriptionUz String   @default("")
+  descriptionEn String   @default("")
+  categoryUz    String?
+  categoryEn    String?
+  ingredientsUz String[] @default([])
+  ingredientsEn String[] @default([])
+
+  imageUrl  String   @default("")
+  oldPrice  Int?
+  newPrice  Int
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("products")
 }
@@ -91,6 +105,12 @@ model PromoCode {
   updatedAt      DateTime  @updatedAt
 
   @@map("promo_codes")
+}
+
+enum Language {
+  UZ
+  RU
+  EN
 }
 
 enum PromoType {

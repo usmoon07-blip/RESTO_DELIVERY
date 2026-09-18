@@ -1,10 +1,18 @@
 import { useMemo } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 import { formatSum } from '../utils.js';
-import { IconChevron, IconInfo, IconPhone, IconPin, IconReceipt } from '../components/Icons.jsx';
+import { LANGS } from '../i18n.js';
+import { haptic } from '../telegram.js';
+import {
+  IconChevron,
+  IconInfo,
+  IconPhone,
+  IconPin,
+  IconReceipt,
+} from '../components/Icons.jsx';
 
 export default function Profile({ onOpenAddress, onGoOrders }) {
-  const { profile, userName, orders, appConfig, address } = useApp();
+  const { profile, userName, orders, address, lang, setLang, t } = useApp();
 
   const totalSpent = useMemo(
     () =>
@@ -14,41 +22,62 @@ export default function Profile({ onOpenAddress, onGoOrders }) {
     [orders],
   );
 
+  const changeLang = (code) => {
+    if (code === lang) return;
+    haptic('light');
+    setLang(code);
+  };
+
   return (
     <div className="page">
       <div className="screen-head">
-        <h1 className="screen-title">Profil</h1>
+        <h1 className="screen-title">{t('profile')}</h1>
       </div>
 
       <div className="profile__head">
         <div className="profile__ava">{userName.charAt(0).toUpperCase()}</div>
         <div>
           <div className="profile__name">{userName}</div>
-          <div className="profile__phone">
-            {profile?.phone || 'Telefon raqam kiritilmagan'}
-          </div>
+          <div className="profile__phone">{profile?.phone || t('noPhone')}</div>
         </div>
       </div>
 
       <div className="stats">
         <div className="stat">
           <div className="stat__v">{orders.length}</div>
-          <div className="stat__l">Buyurtmalar</div>
+          <div className="stat__l">{t('statOrders')}</div>
         </div>
         <div className="stat">
           <div className="stat__v">{formatSum(totalSpent)}</div>
-          <div className="stat__l">Jami xarid ({appConfig.currency})</div>
+          <div className="stat__l">{t('statSpent', t('currency'))}</div>
         </div>
       </div>
 
-      <div className="rows">
+      {/* ---------------------------- Til tanlash ---------------------------- */}
+      <div className="wrap">
+        <div className="field__label">{t('rowLanguage')}</div>
+        <div className="langs">
+          {LANGS.map((item) => (
+            <button
+              key={item.code}
+              className={`lang ${lang === item.code ? 'lang--on' : ''}`}
+              onClick={() => changeLang(item.code)}
+            >
+              <span className="lang__flag">{item.flag}</span>
+              <span className="lang__label">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rows" style={{ marginTop: 18 }}>
         <button className="row" onClick={onGoOrders}>
           <span className="row__ico">
             <IconReceipt />
           </span>
           <span className="row__text">
-            <span className="row__title">Mening buyurtmalarim</span>
-            <span className="row__sub">Xaridlar tarixi va qayta buyurtma</span>
+            <span className="row__title">{t('rowOrders')}</span>
+            <span className="row__sub">{t('rowOrdersSub')}</span>
           </span>
           <span className="row__go">
             <IconChevron />
@@ -60,10 +89,8 @@ export default function Profile({ onOpenAddress, onGoOrders }) {
             <IconPin />
           </span>
           <span className="row__text">
-            <span className="row__title">Yetkazib berish manzili</span>
-            <span className="row__sub">
-              {address?.text || 'Manzil saqlanmagan'}
-            </span>
+            <span className="row__title">{t('rowAddress')}</span>
+            <span className="row__sub">{address?.text || t('rowNoAddress')}</span>
           </span>
           <span className="row__go">
             <IconChevron />
@@ -75,7 +102,7 @@ export default function Profile({ onOpenAddress, onGoOrders }) {
             <IconPhone />
           </span>
           <span className="row__text">
-            <span className="row__title">Aloqa</span>
+            <span className="row__title">{t('rowContact')}</span>
             <span className="row__sub">+998 90 123-45-67</span>
           </span>
           <span className="row__go">
@@ -88,8 +115,8 @@ export default function Profile({ onOpenAddress, onGoOrders }) {
             <IconInfo />
           </span>
           <span className="row__text">
-            <span className="row__title">Ish vaqti</span>
-            <span className="row__sub">Har kuni 10:00 — 23:00</span>
+            <span className="row__title">{t('rowHours')}</span>
+            <span className="row__sub">{t('rowHoursSub')}</span>
           </span>
         </div>
       </div>
@@ -98,10 +125,7 @@ export default function Profile({ onOpenAddress, onGoOrders }) {
         <div className="brand-mark" style={{ fontSize: 34, color: 'var(--brand)' }}>
           Resto
         </div>
-        <div
-          className="brand-mark__sub"
-          style={{ color: 'var(--ink-3)', marginTop: 4 }}
-        >
+        <div className="brand-mark__sub" style={{ color: 'var(--ink-3)', marginTop: 4 }}>
           Restaurant
         </div>
       </div>

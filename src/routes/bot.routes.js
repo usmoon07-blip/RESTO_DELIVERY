@@ -1,30 +1,40 @@
 import bot from '../core/bot.js';
 import config from '../config/default.js';
-import botController, { isHttps } from '../controllers/botController.js';
+import botController, { isHttps, matchesButton } from '../controllers/botController.js';
+import { t } from '../i18n/index.js';
+import UserModel from '../models/User.js';
 
 /** Bot handlerlarini ro'yxatdan o'tkazish */
 export function registerBotHandlers() {
   bot.start(botController.onStart);
   bot.help(botController.onHelp);
+  bot.command('language', botController.onLanguage);
+
+  // Til tanlash tugmasi
+  bot.action(/^lang:(UZ|RU|EN)$/, botController.onLanguageChosen);
 
   bot.on('contact', botController.onContact);
 
-  bot.hears('📞 Raqamni yuborish', botController.onRequestPhone);
-  bot.hears('📜 Buyurtmalarim', botController.onMyOrders);
-  bot.hears('ℹ️ Biz haqimizda', botController.onAbout);
+  // Tugmalar uch tilda bo'lgani uchun matn bo'yicha aniqlanadi
+  bot.on('text', async (ctx, next) => {
+    const text = ctx.message?.text;
+    if (!text || text.startsWith('/')) return next();
+
+    if (matchesButton(text, 'btnPhone')) return botController.onRequestPhone(ctx);
+    if (matchesButton(text, 'btnOrders')) return botController.onMyOrders(ctx);
+    if (matchesButton(text, 'btnAbout')) return botController.onAbout(ctx);
+    if (matchesButton(text, 'btnLanguage')) return botController.onLanguage(ctx);
+
+    return next();
+  });
 
   // Mini App ichidan yuborilgan ma'lumot (zaxira variant)
   bot.on('web_app_data', async (ctx) => {
-    await ctx.reply('✅ Ma\'lumot qabul qilindi.');
+    const user = await UserModel.findByTelegramId(ctx.from.id);
+    await ctx.reply(t(user?.language || 'UZ', 'dataReceived'));
   });
 
-  bot.on('message', async (ctx) => {
-    if (ctx.message?.text?.startsWith('/')) return;
-    await ctx.replyWithHTML(
-      'Buyurtma berish uchun pastdagi menyudan foydalaning 👇',
-      botController.mainKeyboard(),
-    );
-  });
+  bot.on('message', botController.onFallback);
 
   bot.catch((error, ctx) => {
     console.error(`❌ Bot xatolik (${ctx.updateType}):`, error.message);
@@ -35,13 +45,12 @@ export function registerBotHandlers() {
 export async function launchBot() {
   registerBotHandlers();
 
-  // Telegram pastki menyu tugmasi (faqat HTTPS bilan ishlaydi)
   try {
     if (isHttps(config.bot.webAppUrl)) {
       await bot.telegram.setChatMenuButton({
         menuButton: {
           type: 'web_app',
-          text: '🍕 Buyurtma',
+          text: '🍽 Menu',
           web_app: { url: config.bot.webAppUrl },
         },
       });
@@ -50,8 +59,9 @@ export async function launchBot() {
     }
 
     await bot.telegram.setMyCommands([
-      { command: 'start', description: 'Botni ishga tushirish' },
-      { command: 'help', description: 'Yordam' },
+      { command: 'start', description: 'Restart / Перезапустить / Qayta ishga tushirish' },
+      { command: 'language', description: 'Language / Язык / Til' },
+      { command: 'help', description: 'Help / Помощь / Yordam' },
     ]);
   } catch (error) {
     console.warn('⚠️  Menyu sozlanmadi:', error.message);

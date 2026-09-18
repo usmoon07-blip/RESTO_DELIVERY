@@ -4,11 +4,8 @@ import OrderModel from '../models/Order.js';
 import UserModel from '../models/User.js';
 import PromoCodeModel, { evaluatePromo } from '../models/PromoCode.js';
 import bot, { sendMessageSafe } from '../core/bot.js';
-import {
-  formatPrice,
-  DELIVERY_LABELS,
-  PAYMENT_LABELS,
-} from '../utils/format.js';
+import { formatPrice } from '../utils/format.js';
+import { LANGUAGES, t, toFieldLang } from '../i18n/index.js';
 
 /** GET /api/client/config — Mini App uchun sozlamalar */
 export function getAppConfig(req, res) {
@@ -34,6 +31,7 @@ export async function getMe(req, res) {
       lastName: req.user.lastName,
       username: req.user.username,
       phone: req.user.phone,
+      language: req.user.language,
       isDevUser: Boolean(req.isDevUser),
     },
   });
@@ -45,11 +43,29 @@ export async function savePhone(req, res, next) {
     const phone = String(req.body?.phone || '').trim();
 
     if (phone.replace(/\D/g, '').length < 9) {
-      return res.status(400).json({ ok: false, error: "Telefon raqam noto'g'ri" });
+      return res
+        .status(400)
+        .json({ ok: false, error: t(req.user.language, 'errPhoneInvalid') });
     }
 
     const user = await UserModel.updatePhone(req.user.telegramId, phone);
     res.json({ ok: true, data: { phone: user.phone } });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/** POST /api/client/me/language — tilni saqlash */
+export async function saveLanguage(req, res, next) {
+  try {
+    const language = String(req.body?.language || '').toUpperCase();
+
+    if (!LANGUAGES.includes(language)) {
+      return res.status(400).json({ ok: false, error: 'Unknown language' });
+    }
+
+    const user = await UserModel.updateLanguage(req.user.telegramId, language);
+    res.json({ ok: true, data: { language: user.language } });
   } catch (error) {
     next(error);
   }
@@ -101,15 +117,19 @@ export async function checkPromo(req, res, next) {
   try {
     const { code, subtotal } = req.body || {};
 
+    const lang = req.user.language;
+
     if (!code || !String(code).trim()) {
-      return res.status(400).json({ ok: false, error: 'Promokodni kiriting' });
+      return res.status(400).json({ ok: false, error: t(lang, 'errPromoEmpty') });
     }
 
     const promo = await PromoCodeModel.findByCode(code);
     const result = evaluatePromo(promo, Math.max(0, Number(subtotal) || 0));
 
     if (!result.ok) {
-      return res.status(400).json({ ok: false, error: result.error });
+      return res
+        .status(400)
+        .json({ ok: false, error: t(lang, result.errorKey, ...(result.args || [])) });
     }
 
     res.json({
@@ -153,30 +173,29 @@ export async function createOrder(req, res, next) {
       promoCode = '',
     } = req.body || {};
 
+    const lang = req.user.language;
+    const field = toFieldLang(lang);
+
     // --- Validatsiya ---
     if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ ok: false, error: "Savatcha bo'sh" });
+      return res.status(400).json({ ok: false, error: t(lang, 'errCartEmpty') });
     }
 
     if (!['DELIVERY', 'PICKUP'].includes(deliveryType)) {
-      return res.status(400).json({ ok: false, error: "Yetkazish turi noto'g'ri" });
+      return res.status(400).json({ ok: false, error: t(lang, 'errDeliveryType') });
     }
 
     if (!['CASH', 'CARD'].includes(paymentMethod)) {
-      return res.status(400).json({ ok: false, error: "To'lov turi noto'g'ri" });
+      return res.status(400).json({ ok: false, error: t(lang, 'errPaymentType') });
     }
 
     const cleanPhone = String(phone).trim();
     if (cleanPhone.replace(/\D/g, '').length < 9) {
-      return res
-        .status(400)
-        .json({ ok: false, error: 'Telefon raqamingizni kiriting' });
+      return res.status(400).json({ ok: false, error: t(lang, 'errPhone') });
     }
 
     if (deliveryType === 'DELIVERY' && !String(address).trim() && latitude == null) {
-      return res
-        .status(400)
-        .json({ ok: false, error: 'Yetkazib berish manzilini kiriting' });
+      return res.status(400).json({ ok: false, error: t(lang, 'errAddress') });
     }
 
     // --- Narxlarni bazadan qayta hisoblash ---
@@ -195,9 +214,16 @@ export async function createOrder(req, res, next) {
       const lineTotal = product.newPrice * qty;
       subtotal += lineTotal;
 
+      const localName =
+        field === 'uz'
+          ? product.nameUz || product.name
+          : field === 'en'
+            ? product.nameEn || product.name
+            : product.name;
+
       orderItems.push({
         productId: product.id,
-        name: product.name,
+        name: localName,
         price: product.newPrice,
         qty,
         imageUrl: product.imageUrl,
@@ -206,9 +232,7 @@ export async function createOrder(req, res, next) {
     }
 
     if (orderItems.length === 0) {
-      return res
-        .status(400)
-        .json({ ok: false, error: 'Tanlangan mahsulotlar topilmadi' });
+      return res.status(400).json({ ok: false, error: t(lang, 'errProducts') });
     }
 
     // --- Promokod (narx kabi, u ham serverda qayta tekshiriladi) ---
@@ -220,7 +244,9 @@ export async function createOrder(req, res, next) {
       const result = evaluatePromo(promo, subtotal);
 
       if (!result.ok) {
-        return res.status(400).json({ ok: false, error: result.error });
+        return res
+          .status(400)
+          .json({ ok: false, error: t(lang, result.errorKey, ...(result.args || [])) });
       }
 
       discount = result.discount;
@@ -265,28 +291,28 @@ export async function createOrder(req, res, next) {
       .join('\n');
 
     const message = [
-      '🍕 <b>Buyurtmangiz muvaffaqiyatli qabul qilindi!</b>',
-      'Kuryerimiz tez orada bog\'lanadi 🍕',
+      t(lang, 'orderAccepted'),
+      `${t(lang, 'orderCourier')} 🛵`,
       '',
-      `<b>Buyurtma raqami:</b> #${order.id}`,
+      `<b>${t(lang, 'orderNumber')}:</b> #${order.id}`,
       '',
       itemLines,
       '',
-      `<b>Mahsulotlar:</b> ${formatPrice(subtotal)}`,
+      `<b>${t(lang, 'orderItems')}:</b> ${formatPrice(subtotal)}`,
       discount > 0
-        ? `<b>Chegirma (${appliedPromo.code}):</b> −${formatPrice(discount)}`
+        ? `<b>${t(lang, 'orderDiscount')} (${appliedPromo.code}):</b> −${formatPrice(discount)}`
         : null,
       deliveryFee > 0
-        ? `<b>Yetkazib berish:</b> ${formatPrice(deliveryFee)}`
+        ? `<b>${t(lang, 'orderDelivery')}:</b> ${formatPrice(deliveryFee)}`
         : deliveryType === 'DELIVERY'
-          ? '<b>Yetkazib berish:</b> Bepul 🎁'
+          ? `<b>${t(lang, 'orderDelivery')}:</b> ${t(lang, 'orderFree')}`
           : null,
-      `<b>Jami:</b> ${formatPrice(total)}`,
+      `<b>${t(lang, 'orderTotal')}:</b> ${formatPrice(total)}`,
       '',
-      `<b>Turi:</b> ${DELIVERY_LABELS[deliveryType]}`,
-      `<b>To'lov:</b> ${PAYMENT_LABELS[paymentMethod]}`,
-      order.address ? `<b>Manzil:</b> ${order.address}` : null,
-      `<b>Telefon:</b> ${cleanPhone}`,
+      `<b>${t(lang, 'orderType')}:</b> ${t(lang, 'delivery')[deliveryType]}`,
+      `<b>${t(lang, 'orderPayment')}:</b> ${t(lang, 'payment')[paymentMethod]}`,
+      order.address ? `<b>${t(lang, 'orderAddress')}:</b> ${order.address}` : null,
+      `<b>${t(lang, 'orderPhone')}:</b> ${cleanPhone}`,
     ]
       .filter(Boolean)
       .join('\n');
@@ -295,10 +321,7 @@ export async function createOrder(req, res, next) {
       await sendMessageSafe(req.user.telegramId, message);
 
       if (order.latitude != null && order.longitude != null) {
-        await sendMessageSafe(
-          req.user.telegramId,
-          '📍 Qabul qilingan manzilingiz:',
-        );
+        await sendMessageSafe(req.user.telegramId, t(lang, 'orderLocation'));
         try {
           await bot.telegram.sendLocation(
             req.user.telegramId,
@@ -323,6 +346,7 @@ export default {
   getAppConfig,
   getMe,
   savePhone,
+  saveLanguage,
   getProducts,
   getCategories,
   getPromos,

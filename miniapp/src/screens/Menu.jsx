@@ -4,6 +4,7 @@ import Banners from '../components/Banners.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import { useApp } from '../context/AppContext.jsx';
 import { categoryEmoji } from '../utils.js';
+import { categoryName, productDescription, productName } from '../i18n.js';
 import { haptic } from '../telegram.js';
 import {
   IconChevron,
@@ -18,7 +19,7 @@ import {
  * Bo'lim kartochkalari faqat ekranga yaqinlashganda yuklanadi.
  * Menyu katta bo'lganda (100+ taom) ilova sekinlashmasligi uchun.
  */
-function MenuSection({ category, items, onOpenProduct, innerRef }) {
+function MenuSection({ category, title, count, items, onOpenProduct, innerRef }) {
   const [mounted, setMounted] = useState(false);
   const localRef = useRef(null);
 
@@ -53,8 +54,8 @@ function MenuSection({ category, items, onOpenProduct, innerRef }) {
       }}
     >
       <div className="section-head">
-        <h2 className="section-head__title">{category}</h2>
-        <span className="section-head__count">{items.length} ta taom</span>
+        <h2 className="section-head__title">{title}</h2>
+        <span className="section-head__count">{count}</span>
       </div>
 
       {mounted ? (
@@ -75,9 +76,9 @@ function MenuSection({ category, items, onOpenProduct, innerRef }) {
 }
 
 export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
-  const { products, categories, address } = useApp();
+  const { products, categories, address, lang, t } = useApp();
   const [query, setQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState(categories[0] || '');
+  const [activeCategory, setActiveCategory] = useState(categories[0]?.key || '');
 
   const sectionRefs = useRef({});
   // Kategoriya bosilganda skroll kuzatuvchisi vaqtincha to'xtatiladi
@@ -90,22 +91,34 @@ export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
     const q = query.trim().toLowerCase();
     if (!q) return [];
     return products
-      .filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q),
-      )
+      .filter((p) => {
+        const haystack = [
+          p.name,
+          p.nameUz,
+          p.nameEn,
+          p.description,
+          p.descriptionUz,
+          p.descriptionEn,
+          p.category,
+          p.categoryUz,
+          p.categoryEn,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(q);
+      })
       .slice(0, 60);
   }, [products, query]);
 
   const grouped = useMemo(
     () =>
       categories.map((category) => ({
-        category,
-        items: products.filter((p) => p.category === category),
+        category: category.key,
+        title: categoryName(category, lang),
+        items: products.filter((p) => p.category === category.key),
       })),
-    [products, categories],
+    [products, categories, lang],
   );
 
   /* Skroll paytida faol kategoriyani belgilash */
@@ -182,7 +195,7 @@ export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Menyudan qidirish"
+              placeholder={t('searchPlaceholder')}
             />
             {searching && (
               <button
@@ -204,12 +217,10 @@ export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
         </span>
         <span className="addr__text">
           <span className="addr__title">
-            {address?.text || 'Manzilni belgilang'}
+            {address?.text || t('setAddress')}
           </span>
           <span className="addr__sub">
-            {address?.mode === 'PICKUP'
-              ? '15 daqiqada tayyor bo\'ladi'
-              : '45 daqiqada yetkazamiz'}
+            {address?.mode === 'PICKUP' ? t('etaPickup') : t('etaDelivery')}
           </span>
         </span>
         <span className="addr__go">
@@ -221,8 +232,8 @@ export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
         /* --------------------------- Qidiruv --------------------------- */
         <section className="section" style={{ paddingTop: 18 }}>
           <div className="section-head">
-            <h2 className="section-head__title">Qidiruv natijasi</h2>
-            <span className="section-head__count">{found.length} ta</span>
+            <h2 className="section-head__title">{t('searchResults')}</h2>
+            <span className="section-head__count">{t('itemCount', found.length)}</span>
           </div>
 
           {found.length === 0 ? (
@@ -230,10 +241,8 @@ export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
               <div className="empty__ico">
                 <IconSearch />
               </div>
-              <div className="empty__title">Hech narsa topilmadi</div>
-              <div className="empty__text">
-                Boshqa nom bilan qidirib ko'ring
-              </div>
+              <div className="empty__title">{t('nothingFound')}</div>
+              <div className="empty__text">{t('tryAnother')}</div>
             </div>
           ) : (
             <div className="grid">
@@ -256,13 +265,13 @@ export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
               <span className="quick__ico quick__ico--a">
                 <IconSpark />
               </span>
-              Aksiyalar
+              {t('promos')}
             </button>
             <button className="quick__btn" onClick={onGoPromos}>
               <span className="quick__ico quick__ico--b">
                 <IconTicket />
               </span>
-              Promokodlar
+              {t('promoCodes')}
             </button>
           </div>
 
@@ -273,22 +282,24 @@ export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
             <div className="cats__rail" ref={catsRef}>
               {categories.map((category) => (
                 <button
-                  key={category}
-                  className={`cat ${activeCategory === category ? 'cat--on' : ''}`}
-                  onClick={() => goToCategory(category)}
+                  key={category.key}
+                  className={`cat ${activeCategory === category.key ? 'cat--on' : ''}`}
+                  onClick={() => goToCategory(category.key)}
                 >
-                  <span className="cat__emoji">{categoryEmoji(category)}</span>
-                  {category}
+                  <span className="cat__emoji">{categoryEmoji(category.key)}</span>
+                  {categoryName(category, lang)}
                 </button>
               ))}
             </div>
           </div>
 
           {/* -------------------------- Bo'limlar -------------------------- */}
-          {grouped.map(({ category, items }) => (
+          {grouped.map(({ category, title, items }) => (
             <MenuSection
               key={category}
               category={category}
+              title={title}
+              count={t('dishCount', items.length)}
               items={items}
               onOpenProduct={onOpenProduct}
               innerRef={(el) => {

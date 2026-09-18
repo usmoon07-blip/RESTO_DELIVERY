@@ -9,15 +9,15 @@ import {
 } from './Icons.jsx';
 
 const ITEMS = [
-  { key: 'menu', Icon: IconDish, label: 'Menyu' },
-  { key: 'orders', Icon: IconReceipt, label: 'Buyurtmalar' },
-  { key: 'cart', Icon: IconBag, label: 'Savat' },
-  { key: 'promos', Icon: IconSpark, label: 'Aksiyalar' },
-  { key: 'profile', Icon: IconUser, label: 'Profil' },
+  { key: 'menu', Icon: IconDish, label: 'navMenu' },
+  { key: 'orders', Icon: IconReceipt, label: 'orders' },
+  { key: 'cart', Icon: IconBag, label: 'cart' },
+  { key: 'promos', Icon: IconSpark, label: 'promos' },
+  { key: 'profile', Icon: IconUser, label: 'profile' },
 ];
 
 export default function BottomNav({ tab, onChange }) {
-  const { cartCount } = useApp();
+  const { cartCount, t } = useApp();
 
   return (
     <nav className="nav">
@@ -31,7 +31,7 @@ export default function BottomNav({ tab, onChange }) {
           }}
         >
           <Icon />
-          <span className="nav__label">{label}</span>
+          <span className="nav__label">{t(label)}</span>
           {key === 'cart' && cartCount > 0 && (
             <span className="nav__dot">{cartCount}</span>
           )}

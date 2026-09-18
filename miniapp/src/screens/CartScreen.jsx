@@ -4,6 +4,7 @@ import { formatSum } from '../utils.js';
 import { haptic } from '../telegram.js';
 import api from '../api.js';
 import { Placeholder } from '../components/ProductCard.jsx';
+import { productName } from '../i18n.js';
 import {
   IconBag,
   IconCheck,
@@ -26,6 +27,8 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
     setPromo,
     appConfig,
     showToast,
+    lang,
+    t,
   } = useApp();
 
   const [code, setCode] = useState('');
@@ -60,7 +63,7 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
       setPromo({ code: result.code, discount: result.discount });
       setCode('');
       haptic('success');
-      showToast(`Promokod qo'llanildi: −${formatSum(result.discount)}`);
+      showToast(t('promoApplied', formatSum(result.discount)));
     } catch (e) {
       setPromoError(e.message);
       haptic('error');
@@ -75,19 +78,17 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
     return (
       <div className="page">
         <div className="screen-head">
-          <h1 className="screen-title">Savat</h1>
+          <h1 className="screen-title">{t('cart')}</h1>
         </div>
 
         <div className="empty">
           <div className="empty__ico">
             <IconBag />
           </div>
-          <div className="empty__title">Savat bo'sh</div>
-          <div className="empty__text">
-            Menyudan o'zingizga yoqqan taomni tanlang
-          </div>
+          <div className="empty__title">{t('cartEmpty')}</div>
+          <div className="empty__text">{t('cartEmptyText')}</div>
           <button className="btn btn--brand" onClick={onGoMenu}>
-            Menyuni ochish
+            {t('openMenu')}
           </button>
         </div>
       </div>
@@ -97,8 +98,8 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
   return (
     <div className="page">
       <div className="screen-head">
-        <h1 className="screen-title">Savat</h1>
-        <div className="screen-sub">{cart.length} xil taom</div>
+        <h1 className="screen-title">{t('cart')}</h1>
+        <div className="screen-sub">{t('cartKinds', cart.length)}</div>
       </div>
 
       <div className="wrap">
@@ -125,7 +126,7 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
                   </button>
                 </div>
                 <div className="citem__price">
-                  {formatSum(item.price * item.qty)} {appConfig.currency}
+                  {formatSum(item.price * item.qty)} {t('currency')}
                 </div>
               </div>
             </div>
@@ -143,8 +144,12 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
               )}
             </div>
             <div className="upsell__text">
-              Bunga qo'shimcha ravishda <b>{upsell.name}</b> ni atigi{' '}
-              {formatSum(upsell.newPrice)} {appConfig.currency} ga qo'shasizmi?
+              {t(
+                'upsell',
+                productName(upsell, lang),
+                formatSum(upsell.newPrice),
+                t('currency'),
+              )}
             </div>
             <button
               className={`switch ${upsellOn ? 'switch--on' : ''}`}
@@ -163,17 +168,17 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
             <span className="promo-applied__text">
               <span className="promo-applied__code">{promo.code}</span>
               <span className="promo-applied__sub">
-                −{formatSum(promo.discount)} {appConfig.currency}
+                −{formatSum(promo.discount)} {t('currency')}
               </span>
             </span>
             <button
               className="link"
               onClick={() => {
                 setPromo(null);
-                showToast('Promokod olib tashlandi');
+                showToast(t('promoRemoved'));
               }}
             >
-              Olib tashlash
+              {t('promoRemove')}
             </button>
           </div>
         ) : (
@@ -181,7 +186,7 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
             <div className="promo-row">
               <input
                 className="input"
-                placeholder="Promokod"
+                placeholder={t('promoPlaceholder')}
                 value={code}
                 onChange={(e) => {
                   setCode(e.target.value);
@@ -194,7 +199,7 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
                 onClick={applyPromo}
                 disabled={promoBusy || !code.trim()}
               >
-                {promoBusy ? '...' : "Qo'llash"}
+                {promoBusy ? '...' : t('promoApply')}
               </button>
             </div>
             {promoError && (
@@ -208,45 +213,43 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
         {/* ----------------------------- Summa ----------------------------- */}
         <div className="totals">
           <div className="totals__row">
-            <span>Taomlar</span>
+            <span>{t('sumItems')}</span>
             <span>
-              {formatSum(subtotal)} {appConfig.currency}
+              {formatSum(subtotal)} {t('currency')}
             </span>
           </div>
 
           {discount > 0 && (
             <div className="totals__row totals__row--sale">
-              <span>Chegirma ({promo.code})</span>
               <span>
-                −{formatSum(discount)} {appConfig.currency}
+                {t('sumDiscount')} ({promo.code})
+              </span>
+              <span>
+                −{formatSum(discount)} {t('currency')}
               </span>
             </div>
           )}
 
           <div className="totals__row">
-            <span>Yetkazib berish</span>
+            <span>{t('sumDelivery')}</span>
             <span>
               {deliveryFee === 0
-                ? 'Bepul'
-                : `${formatSum(deliveryFee)} ${appConfig.currency}`}
+                ? t('sumFree')
+                : `${formatSum(deliveryFee)} ${t('currency')}`}
             </span>
           </div>
 
           <div className="totals__row totals__row--main">
-            <span>Jami</span>
+            <span>{t('sumTotal')}</span>
             <span>
-              {formatSum(total)} {appConfig.currency}
+              {formatSum(total)} {t('currency')}
             </span>
           </div>
         </div>
 
         {left > 0 && (
           <div className="hint">
-            Yana{' '}
-            <b>
-              {formatSum(left)} {appConfig.currency}
-            </b>{' '}
-            qo'shsangiz, yetkazib berish bepul bo'ladi
+            {t('freeDeliveryLeft', formatSum(left), t('currency'))}
           </div>
         )}
 
@@ -255,7 +258,7 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
           style={{ marginTop: 18 }}
           onClick={onCheckout}
         >
-          Rasmiylashtirish — {formatSum(total)} {appConfig.currency}
+          {t('checkout')} — {formatSum(total)} {t('currency')}
         </button>
       </div>
     </div>

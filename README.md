@@ -231,7 +231,39 @@ Seed bilan 3 ta promokod keladi: `RESTO10` (10%), `YANGI20` (20 000 so'm), `MEZE
 
 ---
 
-## 10. Brend ranglari va shriftlari
+## 10. Uch til: o'zbek, rus, ingliz
+
+Mini App va bot to'liq **3 tilda** ishlaydi.
+
+**Til qanday tanlanadi:**
+1. Foydalanuvchi botda birinchi marta `/start` bosganda til so'raladi
+2. Mini App ochilganda Telegram sozlamasidan avtomatik aniqlanadi
+3. Istalgan vaqtda: Mini App → **Profil** → til tugmalari, yoki botda `/language`
+
+Mini Appda til almashtirilsa, **bot ham o'sha tilga o'tadi** (serverga saqlanadi).
+
+**Nima tarjima qilingan:**
+
+| Qism | Fayl |
+|---|---|
+| Mini App interfeysi (107 kalit) | `miniapp/src/i18n.js` |
+| Bot xabarlari (52 kalit) | `src/i18n/index.js` |
+| Menyu: 25 kategoriya, 156 taom nomi, 338 tarkib | `prisma/menu-i18n.js` |
+
+Taom nomlari bazada uchta ustunda saqlanadi: `name` (ruscha, asosiy),
+`nameUz`, `nameEn`. Tarjima bo'sh bo'lsa **ruscha varianti** ko'rsatiladi —
+ya'ni tarjimasiz taom ham to'g'ri ishlaydi.
+
+**Yangi taom qo'shganda tarjimani qayerga yozish kerak?**
+- Admin Panel → Mahsulotlar → tahrirlash oynasida uchala til uchun maydon bor
+- Yoki `prisma/menu-i18n.js` ga yozib, `npm run db:seed` ni qayta ishga tushiring
+  (tarjimasi topilmagan so'zlar seed oxirida ogohlantirish bilan chiqadi)
+
+> Admin Panel o'zi faqat o'zbek tilida — u restoran xodimlari uchun.
+
+---
+
+## 11. Brend ranglari va shriftlari
 
 Dizayn Resto Restaurant'ning Instagram brendiga moslangan.
 
@@ -258,7 +290,7 @@ Fayllar: `miniapp/public/fonts/` va `admin/public/fonts/`
 
 ---
 
-## 11. Foydali maslahatlar
+## 12. Foydali maslahatlar
 
 - **Brauzerda test qilish:** `.env` da `ALLOW_BROWSER_DEV=true` bo'lsa,
   Mini Appni oddiy brauzerda (http://localhost:5173) ochib sinab ko'rasiz.

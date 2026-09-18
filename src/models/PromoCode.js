@@ -44,26 +44,26 @@ export const PromoCodeModel = {
 
 /**
  * Promokodni tekshiradi va chegirma summasini hisoblaydi.
- * @returns {{ ok: true, promo, discount } | { ok: false, error }}
+ * @returns {{ ok: true, promo, discount } | { ok: false, errorKey, args? }}
  */
 export function evaluatePromo(promo, subtotal) {
   if (!promo || !promo.isActive) {
-    return { ok: false, error: 'Bunday promokod topilmadi' };
+    return { ok: false, errorKey: 'errPromoNotFound' };
   }
 
   if (promo.expiresAt && new Date(promo.expiresAt) < new Date()) {
-    return { ok: false, error: 'Promokod muddati tugagan' };
+    return { ok: false, errorKey: 'errPromoExpired' };
   }
 
   if (promo.usageLimit != null && promo.usedCount >= promo.usageLimit) {
-    return { ok: false, error: "Promokoddan foydalanish limiti tugagan" };
+    return { ok: false, errorKey: 'errPromoLimit' };
   }
 
   if (subtotal < promo.minOrderAmount) {
-    return {
-      ok: false,
-      error: `Bu promokod ${promo.minOrderAmount.toLocaleString('ru-RU').replace(/ /g, ' ')} so'mdan yuqori buyurtmalarga amal qiladi`,
-    };
+    const formatted = promo.minOrderAmount
+      .toLocaleString('ru-RU')
+      .replace(/\u00A0/g, ' ');
+    return { ok: false, errorKey: 'errPromoMin', args: [formatted] };
   }
 
   let discount =

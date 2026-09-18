@@ -33,7 +33,7 @@ export const ProductModel = {
   async categories() {
     const rows = await prisma.product.findMany({
       where: { isActive: true },
-      select: { category: true },
+      select: { category: true, categoryUz: true, categoryEn: true },
       orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
     });
 
@@ -42,7 +42,12 @@ export const ProductModel = {
     for (const row of rows) {
       if (seen.has(row.category)) continue;
       seen.add(row.category);
-      ordered.push(row.category);
+      ordered.push({
+        key: row.category,
+        ru: row.category,
+        uz: row.categoryUz || row.category,
+        en: row.categoryEn || row.category,
+      });
     }
     return ordered;
   },

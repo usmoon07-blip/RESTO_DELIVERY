@@ -3,9 +3,10 @@ import OrderModel from '../models/Order.js';
 import UserModel from '../models/User.js';
 import PromoCodeModel from '../models/PromoCode.js';
 import { sendMessageSafe } from '../core/bot.js';
-import { formatPrice, STATUS_LABELS, STATUS_EMOJI } from '../utils/format.js';
+import { formatPrice } from '../utils/format.js';
+import { STATUS_EMOJI, t } from '../i18n/index.js';
 
-const VALID_STATUSES = Object.keys(STATUS_LABELS);
+const VALID_STATUSES = Object.keys(STATUS_EMOJI);
 
 /** POST /api/admin/login — parolni tekshirish (adminAuth middleware ishlatiladi) */
 export function login(req, res) {
@@ -69,9 +70,16 @@ export async function updateOrderStatus(req, res, next) {
 
     const order = await OrderModel.updateStatus(req.params.id, status);
 
+    // Mijozga xabar uning o'z tilida boradi
+    const lang = order.user.language || 'UZ';
     await sendMessageSafe(
       order.user.telegramId,
-      `${STATUS_EMOJI[status]} <b>Buyurtma #${order.id}</b>\n\nHolati: <b>${STATUS_LABELS[status]}</b>\nSumma: ${formatPrice(order.total)}`,
+      [
+        `${STATUS_EMOJI[status]} ${t(lang, 'statusTitle', order.id)}`,
+        '',
+        `${t(lang, 'statusLabel')}: <b>${t(lang, 'status')[status]}</b>`,
+        `${t(lang, 'sumLabel')}: ${formatPrice(order.total)}`,
+      ].join('\n'),
     );
 
     res.json({ ok: true, data: order });
@@ -113,10 +121,28 @@ function normalizeProduct(body = {}) {
       .filter(Boolean);
   }
 
+  const splitList = (value) => {
+    if (Array.isArray(value)) return value;
+    return String(value || '')
+      .split(/[\n,]/)
+      .map((x) => x.trim())
+      .filter(Boolean);
+  };
+
   return {
     name: String(body.name || '').trim(),
     description: String(body.description || '').trim(),
     imageUrl: String(body.imageUrl || '').trim(),
+
+    nameUz: String(body.nameUz || '').trim() || null,
+    nameEn: String(body.nameEn || '').trim() || null,
+    descriptionUz: String(body.descriptionUz || '').trim(),
+    descriptionEn: String(body.descriptionEn || '').trim(),
+    categoryUz: String(body.categoryUz || '').trim() || null,
+    categoryEn: String(body.categoryEn || '').trim() || null,
+    ingredientsUz: splitList(body.ingredientsUz),
+    ingredientsEn: splitList(body.ingredientsEn),
+
     oldPrice: toIntOrNull(body.oldPrice),
     newPrice: toIntOrNull(body.newPrice),
     category: String(body.category || 'Pizza').trim() || 'Pizza',
