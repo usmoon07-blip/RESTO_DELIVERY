@@ -7,13 +7,16 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "node src/index.js",
+    "start": "concurrently -n \"BACKEND,MINIAPP,ADMIN\" -c \"yellow,cyan,magenta\" \"npm:dev\" \"npm:dev:miniapp\" \"npm:dev:admin\"",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev --name init",
     "db:seed": "node prisma/seed.js",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
-    "setup": "npm run db:push && npm run db:seed"
+    "setup": "npm install && npm --prefix miniapp install && npm --prefix admin install && npm run db:push && npm run db:seed",
+    "dev:miniapp": "npm --prefix miniapp run dev",
+    "dev:admin": "npm --prefix admin run dev",
+    "doctor": "node scripts/doctor.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -28,6 +31,7 @@
     "telegraf": "^4.16.3"
   },
   "devDependencies": {
+    "concurrently": "^9.2.4",
     "prisma": "^5.22.0"
   }
 }

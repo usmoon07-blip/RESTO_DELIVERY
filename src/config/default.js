@@ -21,6 +21,10 @@ export const config = {
       .map((s) => s.trim())
       .filter(Boolean),
     webAppUrl: process.env.WEB_APP_URL || 'http://localhost:5173',
+    // Mini App qaysi portda turadi (ngrok tunnelini topish uchun)
+    webAppPort: toInt(process.env.WEB_APP_PORT, 5173),
+    // ngrok manzilini avtomatik topish
+    autoNgrok: toBool(process.env.AUTO_NGROK, true),
   },
 
   admin: {

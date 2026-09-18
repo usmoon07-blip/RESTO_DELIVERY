@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import config, { assertConfig } from './config/default.js';
 import { connectDatabase, disconnectDatabase } from './database/connection.js';
 import { launchBot } from './routes/bot.routes.js';
+import { getWebAppUrl } from './core/webapp.js';
 import bot from './core/bot.js';
 import { UPLOAD_DIR } from './middlewares/upload.middleware.js';
 import clientRoutes from './routes/client.routes.js';
@@ -66,7 +67,6 @@ async function start() {
 
   app.listen(config.port, () => {
     console.log(`🚀 Server: http://localhost:${config.port}`);
-    console.log(`📱 Mini App URL: ${config.bot.webAppUrl}`);
   });
 
   // Bot ishga tushmasa ham API to'xtab qolmasligi kerak
@@ -77,6 +77,7 @@ async function start() {
     console.error('   BOT_TOKEN to\'g\'riligini va internet aloqasini tekshiring.');
   }
 
+  console.log(`📱 Mini App: ${getWebAppUrl()}`);
   console.log('\n✅ Hammasi tayyor!\n');
 }
 

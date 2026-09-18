@@ -1,6 +1,12 @@
 import bot from '../core/bot.js';
 import config from '../config/default.js';
-import botController, { isHttps, matchesButton } from '../controllers/botController.js';
+import botController, { matchesButton } from '../controllers/botController.js';
+import {
+  detectNgrokUrl,
+  getWebAppUrl,
+  isHttps,
+  setWebAppUrl,
+} from '../core/webapp.js';
 import { t } from '../i18n/index.js';
 import UserModel from '../models/User.js';
 
@@ -41,30 +47,66 @@ export function registerBotHandlers() {
   });
 }
 
-/** Botni ishga tushirish (localhost uchun long polling) */
-export async function launchBot() {
-  registerBotHandlers();
+/** Telegram pastki menyu tugmasini joriy manzilga moslaydi */
+async function syncMenuButton() {
+  const url = getWebAppUrl();
 
   try {
-    if (isHttps(config.bot.webAppUrl)) {
+    if (isHttps(url)) {
       await bot.telegram.setChatMenuButton({
-        menuButton: {
-          type: 'web_app',
-          text: '🍽 Menu',
-          web_app: { url: config.bot.webAppUrl },
-        },
+        menuButton: { type: 'web_app', text: 'Menu', web_app: { url } },
       });
     } else {
       await bot.telegram.setChatMenuButton({ menuButton: { type: 'commands' } });
     }
+  } catch (error) {
+    console.warn('⚠️  Menyu tugmasi sozlanmadi:', error.message);
+  }
+}
 
+/**
+ * ngrok manzilini topib qo'yadi. Topilsa — `.env` ni qo'lda tahrirlash
+ * va serverni qayta ishga tushirish shart emas.
+ */
+export async function refreshWebAppUrl({ quiet = false } = {}) {
+  if (!config.bot.autoNgrok) return getWebAppUrl();
+
+  // .env da allaqachon https manzil turgan bo'lsa, unga tegmaymiz
+  if (isHttps(config.bot.webAppUrl)) return getWebAppUrl();
+
+  const found = await detectNgrokUrl(config.bot.webAppPort);
+  if (!found) return getWebAppUrl();
+
+  if (setWebAppUrl(found)) {
+    console.log(`🔗 ngrok topildi: ${found}`);
+    await syncMenuButton();
+  } else if (!quiet) {
+    console.log(`🔗 Mini App: ${found}`);
+  }
+
+  return found;
+}
+
+/** Botni ishga tushirish (localhost uchun long polling) */
+export async function launchBot() {
+  registerBotHandlers();
+
+  await refreshWebAppUrl({ quiet: true });
+  await syncMenuButton();
+
+  try {
     await bot.telegram.setMyCommands([
       { command: 'start', description: 'Restart / Перезапустить / Qayta ishga tushirish' },
       { command: 'language', description: 'Language / Язык / Til' },
       { command: 'help', description: 'Help / Помощь / Yordam' },
     ]);
   } catch (error) {
-    console.warn('⚠️  Menyu sozlanmadi:', error.message);
+    console.warn('⚠️  Buyruqlar sozlanmadi:', error.message);
+  }
+
+  // ngrok keyinroq ishga tushsa ham o'zi ulanib oladi
+  if (config.bot.autoNgrok && !isHttps(config.bot.webAppUrl)) {
+    setInterval(() => refreshWebAppUrl({ quiet: true }), 20000).unref();
   }
 
   // `launch()` promise'i bot to'xtaguncha yopilmaydi — shuning uchun `await` qilmaymiz.
@@ -75,6 +117,12 @@ export async function launchBot() {
 
   const me = await bot.telegram.getMe();
   console.log(`🤖 Bot ishga tushdi: @${me.username}`);
+
+  if (!isHttps(getWebAppUrl())) {
+    console.log(
+      '⚠️  Mini App tugmasi hali yo\'q — ngrok ishga tushsa, bot uni o\'zi topadi',
+    );
+  }
 
   return me;
 }

@@ -3,10 +3,9 @@ import UserModel from '../models/User.js';
 import OrderModel from '../models/Order.js';
 import { formatPrice } from '../utils/format.js';
 import { LANGUAGES, LANGUAGE_NAMES, STATUS_MARK, t } from '../i18n/index.js';
+import { getWebAppUrl, isHttps } from '../core/webapp.js';
 
 const { restaurantName } = config.business;
-
-export const isHttps = (url) => /^https:\/\//i.test(url || '');
 
 /** Foydalanuvchining tanlagan tili */
 async function langOf(ctx) {
@@ -16,7 +15,7 @@ async function langOf(ctx) {
 
 /** Mini App tugmasi bo'lgan klaviatura */
 export function mainKeyboard(lang = 'UZ') {
-  const url = config.bot.webAppUrl;
+  const url = getWebAppUrl();
 
   const rows = [
     [t(lang, 'btnPhone')],
@@ -52,7 +51,7 @@ async function sendWelcome(ctx, user) {
     mainKeyboard(lang),
   );
 
-  if (!isHttps(config.bot.webAppUrl)) {
+  if (!isHttps(getWebAppUrl())) {
     await ctx.replyWithHTML(t(lang, 'devWarning'));
   }
 
@@ -222,5 +221,4 @@ export default {
   mainKeyboard,
   languageKeyboard,
   matchesButton,
-  isHttps,
 };

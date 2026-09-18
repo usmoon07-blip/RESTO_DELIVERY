@@ -67,44 +67,62 @@ Bazani ko'z bilan ko'rish uchun: `npm run db:studio`
 
 ---
 
-## 4. Ishga tushirish (3 ta alohida terminal)
+## 4. Ishga tushirish
+
+**Bitta buyruq bilan** — backend, Mini App va Admin Panel birga ishga tushadi:
 
 ```bash
-# 1-terminal — Backend + Bot
-npm run dev
-
-# 2-terminal — Mini App
-cd miniapp && npm run dev
-
-# 3-terminal — Admin Panel
-cd admin && npm run dev
+npm start
 ```
+
+Ekranda uchalasining loglari rangli belgilar bilan ko'rinadi:
+
+```
+[BACKEND]  🚀 Server: http://localhost:5000
+[BACKEND]  🤖 Bot ishga tushdi: @sizning_bot
+[MINIAPP]  ➜ Local: http://localhost:5173/
+[ADMIN]    ➜ Local: http://localhost:5174/
+```
+
+To'xtatish: `Ctrl + C` (uchalasi birga to'xtaydi).
+
+> Alohida-alohida ishga tushirmoqchi bo'lsangiz:
+> `npm run dev` · `npm run dev:miniapp` · `npm run dev:admin`
+
+**Ishga tushirishdan oldin tekshirish:**
+
+```bash
+npm run doctor
+```
+
+Bu buyruq `.env`, baza, bot tokeni, ngrok va portlarni tekshirib,
+nima yetishmayotganini va nima qilish kerakligini aytadi.
 
 Admin Panel: http://localhost:5174 (parol — `.env` dagi `ADMIN_PASSWORD`)
 
-Admin Panelda 3 ta bo'lim bor:
+Admin Panelda 4 ta bo'lim bor:
 
 | Bo'lim | Kimga | Vazifasi |
 |---|---|---|
-| 👨‍🍳 **Oshxona ekrani** | Oshpaz / operator | Zakazlar 3 ta ustunda, tovushli signal, 3 soniyada yangilanadi |
+| **Oshxona ekrani** | Oshpaz / operator | Zakazlar 3 ta ustunda, tovushli signal, 3 soniyada yangilanadi |
 | **Buyurtmalar** | Menejer | To'liq jadval, filtr, statistika, tushum |
-| **Mahsulotlar** | Menejer | Pizza qo'shish / tahrirlash / o'chirish |
+| **Mahsulotlar** | Menejer | Taom qo'shish / tahrirlash / surat yuklash |
+| **Promokodlar** | Menejer | Chegirma kodlari |
 
-### 👨‍🍳 Oshxona ekrani qanday ishlaydi
+### Oshxona ekrani qanday ishlaydi
 
 Buyurtma tushishi bilan **"Yangi buyurtmalar"** ustunida paydo bo'ladi,
-kartochka qizil rangda chaqnaydi va signal chalinadi.
+kartochka chaqnaydi va signal chalinadi.
 
 ```
-🔔 Yangi buyurtmalar  →  👨‍🍳 Tayyorlanmoqda  →  🛵 Yo'lda / Olib ketishga tayyor  →  ✅ Yakunlandi
+Yangi buyurtmalar  →  Tayyorlanmoqda  →  Yo'lda / Olib ketishga tayyor  →  Yakunlandi
 ```
 
-- **Tovush:** birinchi marta **"🔔 Tovushni yoqish"** tugmasini bosing
+- **Tovush:** birinchi marta **"Tovushni yoqish"** tugmasini bosing
   (brauzer qoidasi — tovush faqat bir marta bosilgandan keyin ishlaydi).
-- **To'liq ekran:** "⛶ To'liq ekran" tugmasi — planshet yoki devordagi
-  monitor uchun.
-- **Taymer:** har bir kartochkada buyurtma tushganidan beri necha daqiqa
-  o'tgani ko'rinadi. 15 daqiqadan keyin sariq, 25 daqiqadan keyin qizil.
+- **To'liq ekran:** planshet yoki devordagi monitor uchun.
+- **Taymer:** buyurtma tushganidan beri o'tgan vaqt. 15 daqiqadan keyin
+  sariq, 25 daqiqadan keyin qizil.
 - Har bir tugma bosilganda **bot mijozga avtomatik xabar yuboradi**.
 - Yakunlangan va bekor qilingan buyurtmalar ekrandan o'zi yo'qoladi.
 
@@ -124,15 +142,23 @@ localhost'ni ngrok orqali internetga chiqaramiz.
    ```bash
    ngrok http 5173
    ```
-4. Chiqqan `https://....ngrok-free.app` manzilini `.env` ga yozing:
-   ```
-   WEB_APP_URL="https://xxxx-xx-xx.ngrok-free.app"
-   ```
-5. Backendni qayta ishga tushiring (`Ctrl+C` → `npm run dev`).
-6. Botga `/start` yozing — "🍕 Buyurtma berish" tugmasi paydo bo'ladi.
+4. **Tamom.** Bot ngrok manzilini **o'zi topadi** — `.env` ni tahrirlash
+   va serverni qayta ishga tushirish shart emas.
 
-> ngrok'ni har qayta ishga tushirganingizda manzil o'zgaradi —
-> `.env` dagi `WEB_APP_URL` ni yangilab, backendni qayta ishga tushiring.
+   Backend logida shunday yozuv chiqadi:
+   ```
+   🔗 ngrok topildi: https://a1b2-84-54.ngrok-free.app
+   ```
+
+5. Botga `/start` yozing — **"Buyurtma berish"** tugmasi paydo bo'ladi.
+
+> ngrok'ni qayta ishga tushirsangiz manzil o'zgaradi, lekin bot buni
+> 20 soniya ichida o'zi sezadi va tugmani yangilaydi.
+
+**Qanday ishlaydi:** ngrok o'z kompyuteringizda 4040-portda kichik API ochadi.
+Backend o'sha API'dan tunnel manzilini o'qiydi. Avtomatik topishni
+o'chirmoqchi bo'lsangiz, `.env` ga `AUTO_NGROK=false` yozing va
+`WEB_APP_URL` ni qo'lda kiriting.
 
 ---
 
