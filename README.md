@@ -42,8 +42,20 @@ cd admin && npm install && cd ..
 
 ```bash
 npm run db:push    # jadvallarni Neon bazasiga yaratadi
-npm run db:seed    # 4 ta pizza + 2 ta ichimlikni bazaga yozadi
+npm run db:seed    # restoranning to'liq menyusini bazaga yozadi
 ```
+
+`npm run db:seed` **164 ta taomni 25 ta kategoriya bo'yicha** yozadi
+(Мезе–Стартеры, Закуски, Салаты, Супы, Паста, Блюда в тандыре, Шашлыки,
+Стейки, Бургеры, Show-блюда, Теппан, Роллы, Горячие роллы, Маки, Гункан,
+Нигири, Сашими, Кофе, Коктейли, Лимонады va boshqalar) hamda 3 ta promokod.
+
+Menyu `prisma/menu.js` faylida saqlanadi. Taom qo'shish yoki narxni
+o'zgartirish uchun shu faylni tahrirlab `npm run db:seed` ni qayta ishga
+tushiring — yoki Admin Panel orqali qiling.
+
+> Seed menyuda qolmagan eski taomlarni **o'chirmaydi**, faqat yashiradi —
+> shunda eski buyurtmalar tarixi buzilmaydi.
 
 Yoki bitta buyruq bilan:
 

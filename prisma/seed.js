@@ -68,7 +68,16 @@ async function main() {
     }
   }
 
+  // Menyuda qolmagan eski mahsulotlar o'chirilmaydi, faqat yashiriladi —
+  // shunda eski buyurtmalar tarixi buzilmaydi.
+  const menuNames = MENU.map((i) => i.name);
+  const { count: hidden } = await prisma.product.updateMany({
+    where: { name: { notIn: menuNames }, isActive: true },
+    data: { isActive: false },
+  });
+
   console.log(`🍽️  Mahsulotlar: ${added} ta qo'shildi, ${updated} ta yangilandi`);
+  if (hidden > 0) console.log(`     ${hidden} ta eski mahsulot yashirildi`);
 
   const categories = [...new Set(MENU.map((i) => i.category))];
   for (const category of categories) {
