@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../api.js';
 import { formatSum, onImageError } from '../utils.js';
 
@@ -40,6 +40,25 @@ function ProductModal({ product, onClose, onSaved }) {
   );
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef(null);
+
+  const pickFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setError('');
+    try {
+      const url = await api.uploadImage(file);
+      setForm((prev) => ({ ...prev, imageUrl: url }));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
 
   const set = (key) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -144,12 +163,54 @@ function ProductModal({ product, onClose, onSaved }) {
         </div>
 
         <div className="field">
-          <label className="field__label">Rasm URL</label>
+          <label className="field__label">Surat</label>
+
+          <div className="upload">
+            <div className="upload__preview">
+              {form.imageUrl ? (
+                <img src={form.imageUrl} alt="" onError={onImageError} />
+              ) : (
+                <span className="upload__empty">Surat yo'q</span>
+              )}
+            </div>
+
+            <div className="upload__side">
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                onChange={pickFile}
+                style={{ display: 'none' }}
+              />
+              <button
+                type="button"
+                className="btn btn--light btn--sm"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? 'Yuklanmoqda...' : 'Kompyuterdan yuklash'}
+              </button>
+
+              {form.imageUrl && (
+                <button
+                  type="button"
+                  className="btn btn--sm btn--danger"
+                  onClick={() => setForm((prev) => ({ ...prev, imageUrl: '' }))}
+                >
+                  Suratni olib tashlash
+                </button>
+              )}
+
+              <div className="upload__hint">JPG, PNG yoki WEBP · 8 MB gacha</div>
+            </div>
+          </div>
+
           <input
             className="input"
+            style={{ marginTop: 10 }}
             value={form.imageUrl}
             onChange={set('imageUrl')}
-            placeholder="https://..."
+            placeholder="yoki havolani kiriting: https://..."
           />
         </div>
 
@@ -336,7 +397,7 @@ export default function Products({ onAuthError }) {
       ) : products.length === 0 ? (
         <div className="table-wrap">
           <div className="empty-state">
-            <div className="empty-state__icon">🍕</div>
+            <div className="empty-state__icon">—</div>
             <div>Mahsulotlar yo'q. Yangisini qo'shing.</div>
           </div>
         </div>

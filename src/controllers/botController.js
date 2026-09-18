@@ -2,12 +2,7 @@ import config from '../config/default.js';
 import UserModel from '../models/User.js';
 import OrderModel from '../models/Order.js';
 import { formatPrice } from '../utils/format.js';
-import {
-  LANGUAGES,
-  LANGUAGE_NAMES,
-  STATUS_EMOJI,
-  t,
-} from '../i18n/index.js';
+import { LANGUAGES, LANGUAGE_NAMES, STATUS_MARK, t } from '../i18n/index.js';
 
 const { restaurantName } = config.business;
 
@@ -171,10 +166,10 @@ export async function onMyOrders(ctx) {
       });
 
       return [
-        `${STATUS_EMOJI[order.status]} <b>#${order.id}</b> — ${statuses[order.status]}`,
+        `${STATUS_MARK[order.status]} <b>#${order.id}</b> — ${statuses[order.status]}`,
         items,
-        `   💰 ${formatPrice(order.total)}`,
-        `   📅 ${date}`,
+        `   ${formatPrice(order.total)}`,
+        `   ${date}`,
       ].join('\n');
     })
     .join('\n\n');

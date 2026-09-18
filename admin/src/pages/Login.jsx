@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api, { setPassword } from '../api.js';
+import Logo from '../components/Logo.jsx';
 
 export default function Login({ onSuccess }) {
   const [value, setValue] = useState('');
@@ -26,10 +27,7 @@ export default function Login({ onSuccess }) {
     <div className="login">
       <form className="login__card" onSubmit={submit}>
         <div className="login__logo">
-          <div className="brand-mark" style={{ fontSize: 52 }}>
-            Resto
-          </div>
-          <div className="brand-mark__sub">Restaurant</div>
+          <Logo height={62} style={{ margin: '0 auto' }} />
         </div>
         <div className="login__title">Admin Panel</div>
         <div className="login__sub">Boshqaruv paneli</div>

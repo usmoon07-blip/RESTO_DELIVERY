@@ -292,7 +292,7 @@ export async function createOrder(req, res, next) {
 
     const message = [
       t(lang, 'orderAccepted'),
-      `${t(lang, 'orderCourier')} 🛵`,
+      t(lang, 'orderCourier'),
       '',
       `<b>${t(lang, 'orderNumber')}:</b> #${order.id}`,
       '',

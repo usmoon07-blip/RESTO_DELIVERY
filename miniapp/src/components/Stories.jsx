@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react';
 import { haptic } from '../telegram.js';
 import { useApp } from '../context/AppContext.jsx';
-import { IconClose } from './Icons.jsx';
+import {
+  IconClose,
+  IconDish,
+  IconFlame,
+  IconInfo,
+  IconScooter,
+  IconTicket,
+} from './Icons.jsx';
 
-const EMOJIS = ['✨', '🫓', '🔥', '🎟️', '🛵'];
+const ICONS = [IconInfo, IconDish, IconFlame, IconTicket, IconScooter];
 
 export function StoryViewer({ stories, startIndex = 0, onClose, onSeen }) {
   const [index, setIndex] = useState(startIndex);
@@ -51,7 +58,7 @@ export function StoryViewer({ stories, startIndex = 0, onClose, onSeen }) {
       </div>
 
       <div className="sv__body">
-        <div className="sv__emoji">{story.emoji}</div>
+        <story.Icon className="sv__ico" />
         <div className="sv__title">{story.title}</div>
         <div className="sv__text">{story.text}</div>
       </div>
@@ -66,7 +73,7 @@ export default function Stories() {
   const stories = t('stories').map((story, i) => ({
     ...story,
     id: `story-${i}`,
-    emoji: EMOJIS[i] || '✨',
+    Icon: ICONS[i] || IconInfo,
   }));
 
   const [seen, setSeen] = useState(() => {
@@ -102,7 +109,7 @@ export default function Stories() {
             }}
           >
             <div className="story__in">
-              <span className="story__emoji">{story.emoji}</span>
+              <story.Icon className="story__ico" />
               <span className="story__label">{story.label}</span>
             </div>
           </button>

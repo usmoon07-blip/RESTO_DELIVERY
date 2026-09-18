@@ -42,7 +42,26 @@ async function request(path, options = {}) {
   return payload.data;
 }
 
+/** Surat yuklash — FormData yuboriladi, Content-Type brauzer o'zi qo'yadi */
+export async function uploadImage(file) {
+  const body = new FormData();
+  body.append('image', file);
+
+  const response = await fetch(`${BASE}/admin/upload`, {
+    method: 'POST',
+    headers: { 'x-admin-password': getPassword() },
+    body,
+  });
+
+  const payload = await response.json().catch(() => null);
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.error || 'Surat yuklanmadi');
+  }
+  return payload.data.url;
+}
+
 export const api = {
+  uploadImage,
   login: (password) =>
     fetch(`${BASE}/admin/login`, {
       method: 'POST',

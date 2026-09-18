@@ -250,7 +250,7 @@ export default function Promos({ onAuthError }) {
       ) : promos.length === 0 ? (
         <div className="table-wrap">
           <div className="empty-state">
-            <div className="empty-state__icon">🎟️</div>
+            <div className="empty-state__icon">—</div>
             <div>Promokodlar yo'q. Yangisini qo'shing.</div>
           </div>
         </div>

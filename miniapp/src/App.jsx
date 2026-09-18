@@ -4,6 +4,8 @@ import BottomNav from './components/BottomNav.jsx';
 import ProductSheet from './components/ProductSheet.jsx';
 import AddressSheet from './components/AddressSheet.jsx';
 import Toast from './components/Toast.jsx';
+import Logo from './components/Logo.jsx';
+import LanguagePicker from './screens/LanguagePicker.jsx';
 import Onboarding from './screens/Onboarding.jsx';
 import Menu from './screens/Menu.jsx';
 import CartScreen from './screens/CartScreen.jsx';
@@ -15,10 +17,14 @@ import { initTelegram, tg } from './telegram.js';
 import { IconCheck } from './components/Icons.jsx';
 
 const ONBOARDING_KEY = 'resto_onboarding_done';
+const LANG_CHOSEN_KEY = 'resto_lang_chosen';
 
 function Shell() {
   const { loading, error, reload, refreshOrders, t } = useApp();
 
+  const [langChosen, setLangChosen] = useState(
+    () => localStorage.getItem(LANG_CHOSEN_KEY) === '1',
+  );
   const [onboarded, setOnboarded] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) === '1',
   );
@@ -52,6 +58,18 @@ function Shell() {
     setTab(next);
     window.scrollTo({ top: 0 });
   };
+
+  // Birinchi ochilishda avval til so'raladi
+  if (!langChosen) {
+    return (
+      <LanguagePicker
+        onDone={() => {
+          localStorage.setItem(LANG_CHOSEN_KEY, '1');
+          setLangChosen(true);
+        }}
+      />
+    );
+  }
 
   if (!onboarded) {
     return (
@@ -88,7 +106,7 @@ function Shell() {
   if (success) {
     return (
       <div className="success">
-        <div className="brand-mark">Resto</div>
+        <Logo height={46} style={{ color: 'var(--brand)', marginBottom: 26 }} />
         <div className="success__ico">
           <IconCheck />
         </div>

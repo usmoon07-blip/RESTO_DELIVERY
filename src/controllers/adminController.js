@@ -4,9 +4,9 @@ import UserModel from '../models/User.js';
 import PromoCodeModel from '../models/PromoCode.js';
 import { sendMessageSafe } from '../core/bot.js';
 import { formatPrice } from '../utils/format.js';
-import { STATUS_EMOJI, t } from '../i18n/index.js';
+import { STATUS_MARK, t } from '../i18n/index.js';
 
-const VALID_STATUSES = Object.keys(STATUS_EMOJI);
+const VALID_STATUSES = Object.keys(STATUS_MARK);
 
 /** POST /api/admin/login — parolni tekshirish (adminAuth middleware ishlatiladi) */
 export function login(req, res) {
@@ -75,7 +75,7 @@ export async function updateOrderStatus(req, res, next) {
     await sendMessageSafe(
       order.user.telegramId,
       [
-        `${STATUS_EMOJI[status]} ${t(lang, 'statusTitle', order.id)}`,
+        t(lang, 'statusTitle', order.id),
         '',
         `${t(lang, 'statusLabel')}: <b>${t(lang, 'status')[status]}</b>`,
         `${t(lang, 'sumLabel')}: ${formatPrice(order.total)}`,
@@ -308,6 +308,20 @@ export async function deletePromo(req, res, next) {
   }
 }
 
+/* ============================== SURATLAR ============================== */
+
+/** POST /api/admin/upload — mahsulot surati (form-data: image) */
+export function uploadProductImage(req, res) {
+  if (!req.file) {
+    return res.status(400).json({ ok: false, error: 'Surat tanlanmadi' });
+  }
+
+  res.status(201).json({
+    ok: true,
+    data: { url: `/uploads/${req.file.filename}`, size: req.file.size },
+  });
+}
+
 /** GET /api/admin/users */
 export async function getUsers(req, res, next) {
   try {
@@ -333,5 +347,6 @@ export default {
   createPromo,
   updatePromo,
   deletePromo,
+  uploadProductImage,
   getUsers,
 };

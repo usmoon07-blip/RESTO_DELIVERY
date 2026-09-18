@@ -1,3 +1,4 @@
+import path from 'node:path';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -6,6 +7,7 @@ import config, { assertConfig } from './config/default.js';
 import { connectDatabase, disconnectDatabase } from './database/connection.js';
 import { launchBot } from './routes/bot.routes.js';
 import bot from './core/bot.js';
+import { UPLOAD_DIR } from './middlewares/upload.middleware.js';
 import clientRoutes from './routes/client.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 
@@ -21,6 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 if (config.env === 'development') {
   app.use(morgan('dev'));
 }
+
+/* --------------------------- Yuklangan suratlar --------------------------- */
+app.use(
+  '/uploads',
+  express.static(UPLOAD_DIR, { maxAge: '7d', fallthrough: true }),
+);
 
 /* ------------------------------- Routes ------------------------------- */
 app.get('/', (req, res) => {

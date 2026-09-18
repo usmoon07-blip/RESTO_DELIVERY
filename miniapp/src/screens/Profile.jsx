@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext.jsx';
 import { formatSum } from '../utils.js';
 import { LANGS } from '../i18n.js';
 import { haptic } from '../telegram.js';
+import Logo from '../components/Logo.jsx';
 import {
   IconChevron,
   IconInfo,
@@ -121,13 +122,8 @@ export default function Profile({ onOpenAddress, onGoOrders }) {
         </div>
       </div>
 
-      <div className="wrap" style={{ marginTop: 22, textAlign: 'center' }}>
-        <div className="brand-mark" style={{ fontSize: 34, color: 'var(--brand)' }}>
-          Resto
-        </div>
-        <div className="brand-mark__sub" style={{ color: 'var(--ink-3)', marginTop: 4 }}>
-          Restaurant
-        </div>
+      <div className="wrap" style={{ marginTop: 26, display: 'flex', justifyContent: 'center' }}>
+        <Logo height={40} style={{ color: 'var(--brand)', opacity: 0.85 }} />
       </div>
     </div>
   );

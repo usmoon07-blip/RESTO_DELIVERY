@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { adminAuth } from '../middlewares/auth.middleware.js';
 import adminController from '../controllers/adminController.js';
+import handleUpload from '../middlewares/upload.middleware.js';
 
 const router = Router();
 
@@ -21,6 +22,9 @@ router.get('/products', adminController.getProducts);
 router.post('/products', adminController.createProduct);
 router.put('/products/:id', adminController.updateProduct);
 router.delete('/products/:id', adminController.deleteProduct);
+
+// Surat yuklash
+router.post('/upload', handleUpload, adminController.uploadProductImage);
 
 // Promokodlar
 router.get('/promos', adminController.getPromos);

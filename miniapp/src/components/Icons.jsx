@@ -47,6 +47,12 @@ export const IconSpark = (p) => (
   </svg>
 );
 
+export const IconFlame = (p) => (
+  <svg {...base} {...p}>
+    <path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-1.6.7-3 1.6-4.1.4 1 1.1 1.8 1.9 2.1.3-2.9 1-5.3 1.5-7Z" />
+  </svg>
+);
+
 export const IconUser = (p) => (
   <svg {...base} {...p}>
     <circle cx="12" cy="8" r="3.6" />
@@ -164,6 +170,7 @@ export const IconInfo = (p) => (
 
 export default {
   IconMenu,
+  IconFlame,
   IconDish,
   IconReceipt,
   IconBag,

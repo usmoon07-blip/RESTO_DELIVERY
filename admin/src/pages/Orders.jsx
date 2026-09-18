@@ -91,7 +91,7 @@ export default function Orders({ onAuthError }) {
             ))}
           </select>
           <button className="btn btn--light btn--sm" onClick={() => load()}>
-            🔄 Yangilash
+            Yangilash
           </button>
         </div>
       </div>
@@ -128,7 +128,7 @@ export default function Orders({ onAuthError }) {
       ) : orders.length === 0 ? (
         <div className="table-wrap">
           <div className="empty-state">
-            <div className="empty-state__icon">📭</div>
+            <div className="empty-state__icon">—</div>
             <div>Buyurtmalar yo'q</div>
           </div>
         </div>
@@ -179,7 +179,7 @@ export default function Orders({ onAuthError }) {
                       ))}
                     </div>
                     {order.comment && (
-                      <div className="cell-muted">💬 {order.comment}</div>
+                      <div className="cell-muted">Izoh: {order.comment}</div>
                     )}
                   </td>
 
@@ -193,7 +193,7 @@ export default function Orders({ onAuthError }) {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        📍 Xaritada ochish
+                        Xaritada ochish
                       </a>
                     )}
                   </td>

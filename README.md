@@ -263,7 +263,30 @@ ya'ni tarjimasiz taom ham to'g'ri ishlaydi.
 
 ---
 
-## 11. Brend ranglari va shriftlari
+## 11. Taom suratlari
+
+Admin Panel → **Mahsulotlar** → taomni tahrirlash → **Surat** bo'limi:
+
+- **"Kompyuterdan yuklash"** — suratni to'g'ridan-to'g'ri tanlaysiz
+- Yoki tayyor havolani (`https://...`) qo'lda kiritasiz
+
+Yuklangan suratlar `uploads/` papkasida saqlanadi va `/uploads/...` manzili
+orqali beriladi. Bazada faqat yo'li saqlanadi.
+
+| Cheklov | Qiymat |
+|---|---|
+| Format | JPG, PNG, WEBP, AVIF |
+| Hajm | 8 MB gacha |
+
+> `uploads/` papkasi `.gitignore` da — suratlar GitHub'ga yuklanmaydi,
+> faqat sizning kompyuteringizda qoladi.
+
+Surat qo'yilmagan taomlar brend uslubidagi o'rin bosar belgi bilan chiqadi —
+ya'ni menyu suratsiz ham to'liq ishlaydi.
+
+---
+
+## 12. Brend ranglari va shriftlari
 
 Dizayn Resto Restaurant'ning Instagram brendiga moslangan.
 
@@ -278,11 +301,21 @@ Dizayn Resto Restaurant'ning Instagram brendiga moslangan.
 Ranglarni o'zgartirish uchun faqat 2 ta fayldagi `:root` blokini tahrirlang:
 `miniapp/src/styles.css` va `admin/src/styles.css`.
 
+**Logotip** — restoranning asl logotipidan olingan vektor:
+
+| Fayl | Nima |
+|---|---|
+| `public/logo.svg` | To'liq logotip: "Resto" + "RESTAURANT" |
+| `public/logo-script.svg` | Faqat qo'lyozma "Resto" (kichik joylar uchun) |
+
+Logotip SVG niqob orqali chiziladi, rangi `currentColor` bilan beriladi —
+shuning uchun oq fonda taupe, taupe fonda oq bo'lib ko'rinadi.
+`<Logo variant="full" height={40} />` komponenti orqali qo'yiladi.
+
 **Shriftlar** (loyiha ichida saqlangan, internetsiz ham ishlaydi):
 
 | Shrift | Qayerda |
 |---|---|
-| Great Vibes | "Resto" logotipi (qo'lyozma) |
 | Playfair Display | Sarlavhalar (serif) |
 | Inter | Asosiy matn |
 
@@ -290,7 +323,7 @@ Fayllar: `miniapp/public/fonts/` va `admin/public/fonts/`
 
 ---
 
-## 12. Foydali maslahatlar
+## 13. Foydali maslahatlar
 
 - **Brauzerda test qilish:** `.env` da `ALLOW_BROWSER_DEV=true` bo'lsa,
   Mini Appni oddiy brauzerda (http://localhost:5173) ochib sinab ko'rasiz.

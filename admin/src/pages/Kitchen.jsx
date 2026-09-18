@@ -10,21 +10,18 @@ const COLUMNS = [
   {
     key: 'new',
     title: 'Yangi buyurtmalar',
-    icon: '🔔',
     statuses: ['PENDING'],
     action: { label: 'Qabul qildim', next: 'CONFIRMED' },
   },
   {
     key: 'cooking',
     title: 'Tayyorlanmoqda',
-    icon: '👨‍🍳',
     statuses: ['CONFIRMED', 'PREPARING'],
     action: { label: 'Tayyor bo\'ldi', next: null }, // pastda aniqlanadi
   },
   {
     key: 'ready',
     title: "Yo'lda / Olib ketishga tayyor",
-    icon: '🛵',
     statuses: ['DELIVERING'],
     action: { label: 'Yakunlandi', next: 'DELIVERED' },
   },
@@ -72,19 +69,13 @@ function OrderCard({ order, column, isNew, onAdvance, onCancel, busy }) {
       <header className="kds-card__head">
         <div className="kds-card__id">#{order.id}</div>
         <div className={`kds-timer kds-timer--${urgency}`}>
-          ⏱ {minutes} daq
+          {minutes} daqiqa
         </div>
       </header>
 
       <div className="kds-card__meta">
-        <span className="kds-tag">
-          {order.deliveryType === 'PICKUP' ? '🏃' : '🛵'}{' '}
-          {DELIVERY_LABELS[order.deliveryType]}
-        </span>
-        <span className="kds-tag">
-          {order.paymentMethod === 'CARD' ? '💳' : '💵'}{' '}
-          {PAYMENT_LABELS[order.paymentMethod]}
-        </span>
+        <span className="kds-tag">{DELIVERY_LABELS[order.deliveryType]}</span>
+        <span className="kds-tag">{PAYMENT_LABELS[order.paymentMethod]}</span>
         <span className="kds-tag kds-tag--time">{timeOnly(order.createdAt)}</span>
       </div>
 
@@ -97,7 +88,7 @@ function OrderCard({ order, column, isNew, onAdvance, onCancel, busy }) {
         ))}
       </ul>
 
-      {order.comment && <div className="kds-comment">💬 {order.comment}</div>}
+      {order.comment && <div className="kds-comment">{order.comment}</div>}
 
       <div className="kds-card__info">
         <div>
@@ -105,7 +96,7 @@ function OrderCard({ order, column, isNew, onAdvance, onCancel, busy }) {
           <a href={`tel:${order.phone}`}>{order.phone}</a>
         </div>
         {order.deliveryType === 'DELIVERY' && order.address && (
-          <div className="kds-address">📍 {order.address}</div>
+          <div className="kds-address">{order.address}</div>
         )}
         <div className="kds-total">{formatSum(order.total)} so'm</div>
       </div>
@@ -224,7 +215,7 @@ export default function Kitchen({ onAuthError }) {
     <div className="kds">
       <div className="kds__bar">
         <div className="kds__title">
-          👨‍🍳 Oshxona ekrani
+          Oshxona ekrani
           <span className="live-dot" style={{ marginLeft: 12 }}>
             har 3 soniyada yangilanadi
           </span>
@@ -233,14 +224,14 @@ export default function Kitchen({ onAuthError }) {
         <div className="toolbar">
           {!soundOn && (
             <button className="btn btn--accent btn--sm" onClick={toggleSound}>
-              🔔 Tovushni yoqish
+              Tovushni yoqish
             </button>
           )}
           {soundOn && (
-            <span className="kds__sound-on">🔔 Tovush yoqilgan</span>
+            <span className="kds__sound-on">Tovush yoqilgan</span>
           )}
           <button className="btn btn--light btn--sm" onClick={toggleFullscreen}>
-            ⛶ To'liq ekran
+            To'liq ekran
           </button>
         </div>
       </div>
@@ -248,7 +239,7 @@ export default function Kitchen({ onAuthError }) {
       {!soundOn && (
         <div className="kds__hint">
           Yangi buyurtma kelganda signal eshitilishi uchun bir marta{' '}
-          <b>"🔔 Tovushni yoqish"</b> tugmasini bosing (brauzer qoidasi shuni
+          <b>"Tovushni yoqish"</b> tugmasini bosing (brauzer qoidasi shuni
           talab qiladi).
         </div>
       )}
@@ -265,9 +256,7 @@ export default function Kitchen({ onAuthError }) {
             return (
               <section className="kds-col" key={column.key}>
                 <header className="kds-col__head">
-                  <span>
-                    {column.icon} {column.title}
-                  </span>
+                  <span>{column.title}</span>
                   <span className="kds-col__count">{list.length}</span>
                 </header>
 

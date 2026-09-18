@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { haptic } from '../telegram.js';
 import { useApp } from '../context/AppContext.jsx';
+import Logo from '../components/Logo.jsx';
+import { IconDish, IconScooter, IconSpark } from '../components/Icons.jsx';
 
-const EMOJIS = ['🫓', '⚡️', '🛵'];
+const ICONS = [IconDish, IconSpark, IconScooter];
 
 export default function Onboarding({ onFinish }) {
   const { t } = useApp();
@@ -20,10 +22,7 @@ export default function Onboarding({ onFinish }) {
   return (
     <div className="onboard">
       <div className="onboard__top">
-        <div>
-          <div className="brand-mark">Resto</div>
-          <div className="brand-mark__sub">Restaurant</div>
-        </div>
+        <Logo height={44} style={{ color: 'var(--brand)' }} />
         <button className="onboard__skip" onClick={onFinish}>
           {isLast ? '' : t('skip')}
         </button>
@@ -31,7 +30,10 @@ export default function Onboarding({ onFinish }) {
 
       <div className="onboard__visual">
         <div className="onboard__circle" key={index}>
-          {EMOJIS[index]}
+          {(() => {
+            const Icon = ICONS[index];
+            return <Icon className="onboard__ico" />;
+          })()}
         </div>
       </div>
 

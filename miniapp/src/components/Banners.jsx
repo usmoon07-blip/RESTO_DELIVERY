@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
+import { IconFlame, IconScooter, IconTicket } from './Icons.jsx';
 
 const STYLES = [
-  { glyph: '🛵', className: 'banner--1' },
-  { glyph: '🎟️', className: 'banner--2' },
-  { glyph: '🔥', className: 'banner--3' },
+  { Glyph: IconScooter, className: 'banner--1' },
+  { Glyph: IconTicket, className: 'banner--2' },
+  { Glyph: IconFlame, className: 'banner--3' },
 ];
 
 export default function Banners({ onBannerClick }) {
@@ -34,7 +35,7 @@ export default function Banners({ onBannerClick }) {
             className={`banner ${banner.className}`}
             onClick={() => onBannerClick?.(banner)}
           >
-            <span className="banner__glyph">{banner.glyph}</span>
+            <banner.Glyph className="banner__glyph" />
             <span className="banner__tag">{banner.tag}</span>
             <span className="banner__title">{banner.title}</span>
             <span className="banner__sub">{banner.sub}</span>

@@ -9,3 +9,7 @@ npm-debug.log*
 .vscode/
 .idea/
 prisma/migrations/dev.db*
+
+# Yuklangan suratlar (bazada yo'llari saqlanadi)
+uploads/*
+!uploads/.gitkeep

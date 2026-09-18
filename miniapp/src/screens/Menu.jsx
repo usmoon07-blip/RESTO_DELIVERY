@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Stories from '../components/Stories.jsx';
 import Banners from '../components/Banners.jsx';
 import ProductCard from '../components/ProductCard.jsx';
+import Logo from '../components/Logo.jsx';
 import { useApp } from '../context/AppContext.jsx';
-import { categoryEmoji } from '../utils.js';
 import { categoryName, productDescription, productName } from '../i18n.js';
 import { haptic } from '../telegram.js';
 import {
@@ -185,10 +185,7 @@ export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
       {/* ------------------------------ Header ------------------------------ */}
       <header className="hdr">
         <div className="hdr__row">
-          <div className="hdr__brand">
-            <div className="brand-mark">Resto</div>
-            <div className="brand-mark__sub">Restaurant</div>
-          </div>
+          <Logo variant="script" height={27} className="hdr__logo" />
 
           <label className="search">
             <IconSearch />
@@ -286,7 +283,6 @@ export default function Menu({ onOpenProduct, onOpenAddress, onGoPromos }) {
                   className={`cat ${activeCategory === category.key ? 'cat--on' : ''}`}
                   onClick={() => goToCategory(category.key)}
                 >
-                  <span className="cat__emoji">{categoryEmoji(category.key)}</span>
                   {categoryName(category, lang)}
                 </button>
               ))}

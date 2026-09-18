@@ -4,6 +4,7 @@ import Orders from './pages/Orders.jsx';
 import Products from './pages/Products.jsx';
 import Kitchen from './pages/Kitchen.jsx';
 import Promos from './pages/Promos.jsx';
+import Logo from './components/Logo.jsx';
 import { clearPassword, getPassword } from './api.js';
 
 export default function App() {
@@ -21,8 +22,7 @@ export default function App() {
     <div className="layout">
       <header className="topbar">
         <div className="topbar__logo">
-          <div className="brand-mark">Resto</div>
-          <div className="brand-mark__sub">Restaurant</div>
+          <Logo height={34} />
         </div>
 
         <nav className="tabs">
@@ -30,7 +30,7 @@ export default function App() {
             className={`tab ${page === 'kitchen' ? 'tab--active' : ''}`}
             onClick={() => setPage('kitchen')}
           >
-            👨‍🍳 Oshxona ekrani
+            Oshxona ekrani
           </button>
           <button
             className={`tab ${page === 'orders' ? 'tab--active' : ''}`}
