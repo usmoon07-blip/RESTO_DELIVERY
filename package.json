@@ -7,7 +7,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "concurrently -n \"BACKEND,MINIAPP,ADMIN\" -c \"yellow,cyan,magenta\" \"npm:dev\" \"npm:dev:miniapp\" \"npm:dev:admin\"",
+    "start": "concurrently -n \"BACKEND,MINIAPP,ADMIN,TUNNEL\" -c \"yellow,cyan,magenta,green\" \"npm:dev\" \"npm:dev:miniapp\" \"npm:dev:admin\" \"npm:tunnel\"",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev --name init",
     "db:seed": "node prisma/seed.js",
@@ -16,6 +16,7 @@
     "setup": "npm install && npm --prefix miniapp install && npm --prefix admin install && npm run db:push && npm run db:seed",
     "dev:miniapp": "npm --prefix miniapp run dev",
     "dev:admin": "npm --prefix admin run dev",
+    "tunnel": "node scripts/tunnel.js",
     "doctor": "node scripts/doctor.js"
   },
   "prisma": {

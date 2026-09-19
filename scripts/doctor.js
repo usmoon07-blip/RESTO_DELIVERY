@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import net from 'node:net';
 import { PrismaClient } from '@prisma/client';
 import config from '../src/config/default.js';
-import { detectNgrokUrl } from '../src/core/webapp.js';
+import { detectNgrokUrl, detectTunnelFileUrl } from '../src/core/webapp.js';
 
 const OK = '  ✅';
 const NO = '  ❌';
@@ -133,18 +133,20 @@ if (config.bot.token) {
   }
 }
 
-/* ----------------------------- 4. ngrok ----------------------------- */
+/* ----------------------------- 4. Tunnel ----------------------------- */
 console.log('\n4. Mini App manzili');
 if (/^https:\/\//i.test(config.bot.webAppUrl)) {
   console.log(`${OK} .env da https manzil turibdi: ${config.bot.webAppUrl}`);
 } else {
-  const found = await detectNgrokUrl(config.bot.webAppPort);
+  const tunnel = detectTunnelFileUrl();
+  const found = tunnel || (await detectNgrokUrl(config.bot.webAppPort));
   if (found) {
-    console.log(`${OK} ngrok ishlayapti: ${found}`);
+    console.log(`${OK} Tunnel ishlayapti: ${found}`);
     console.log("      Bot uni o'zi topadi — .env ni tahrirlash shart emas");
   } else {
-    console.log(`${WARN} ngrok ishlamayapti`);
-    console.log('      → Alohida terminalda: ngrok http 5173');
+    console.log(`${WARN} Tunnel ishlamayapti`);
+    console.log('      → Alohida terminalda: npm run tunnel');
+    console.log('      (yoki `npm start` — u tunnelni ham o\'zi ishga tushiradi)');
     console.log('      Busiz bot ishlaydi, lekin Mini App tugmasi chiqmaydi');
   }
 }

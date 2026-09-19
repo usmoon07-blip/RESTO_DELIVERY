@@ -1,10 +1,15 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import config from '../config/default.js';
 
 /**
- * Mini App manzili ishlash vaqtida o'zgarishi mumkin (ngrok qayta ishga
+ * Mini App manzili ishlash vaqtida o'zgarishi mumkin (tunnel qayta ishga
  * tushganda manzil almashadi), shuning uchun u shu yerda saqlanadi.
  */
 let current = config.bot.webAppUrl;
+
+/** Cloudflare tunneli manzilini shu faylga yozadi (scripts/tunnel.js) */
+const TUNNEL_FILE = path.join(process.cwd(), '.tunnel-url');
 
 export const isHttps = (url) => /^https:\/\//i.test(url || '');
 
@@ -19,9 +24,21 @@ export function setWebAppUrl(url) {
 }
 
 /**
+ * Cloudflare tunneli `.tunnel-url` fayliga manzilni yozadi.
+ * Hech qanday ro'yxatdan o'tish va token kerak emas.
+ */
+export function detectTunnelFileUrl() {
+  try {
+    const url = fs.readFileSync(TUNNEL_FILE, 'utf8').trim();
+    return isHttps(url) ? url : null;
+  } catch {
+    return null; // tunnel hali ishga tushmagan — muammo emas
+  }
+}
+
+/**
  * ngrok o'zining lokal API'sini 4040-portda ochadi.
- * Shu orqali tunnel manzilini avtomatik topamiz — `.env` ni qo'lda
- * tahrirlash shart emas.
+ * Kimda ngrok bo'lsa, u ham avtomatik ishlaydi.
  */
 export async function detectNgrokUrl(targetPort) {
   const endpoints = [
@@ -57,4 +74,19 @@ export async function detectNgrokUrl(targetPort) {
   return null;
 }
 
-export default { getWebAppUrl, setWebAppUrl, detectNgrokUrl, isHttps };
+/**
+ * Mini App uchun tashqi https manzilni topadi:
+ * avval Cloudflare tunneli, keyin ngrok.
+ */
+export async function detectPublicUrl(targetPort) {
+  return detectTunnelFileUrl() || (await detectNgrokUrl(targetPort));
+}
+
+export default {
+  getWebAppUrl,
+  setWebAppUrl,
+  detectTunnelFileUrl,
+  detectNgrokUrl,
+  detectPublicUrl,
+  isHttps,
+};

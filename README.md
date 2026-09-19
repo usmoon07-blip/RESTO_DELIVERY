@@ -69,25 +69,27 @@ Bazani ko'z bilan ko'rish uchun: `npm run db:studio`
 
 ## 4. Ishga tushirish
 
-**Bitta buyruq bilan** — backend, Mini App va Admin Panel birga ishga tushadi:
+**Bitta buyruq bilan** — hamma narsa birga ishga tushadi:
 
 ```bash
 npm start
 ```
 
-Ekranda uchalasining loglari rangli belgilar bilan ko'rinadi:
+Bu buyruq backend, Mini App, Admin Panel va HTTPS tunnelni birga
+ishga tushiradi. Ekranda hammasining loglari rangli belgilar bilan ko'rinadi:
 
 ```
 [BACKEND]  🚀 Server: http://localhost:5000
 [BACKEND]  🤖 Bot ishga tushdi: @sizning_bot
 [MINIAPP]  ➜ Local: http://localhost:5173/
 [ADMIN]    ➜ Local: http://localhost:5174/
+[TUNNEL]   Mini App manzili: https://xxx-yyy-zzz.trycloudflare.com
 ```
 
-To'xtatish: `Ctrl + C` (uchalasi birga to'xtaydi).
+To'xtatish: `Ctrl + C` (hammasi birga to'xtaydi).
 
 > Alohida-alohida ishga tushirmoqchi bo'lsangiz:
-> `npm run dev` · `npm run dev:miniapp` · `npm run dev:admin`
+> `npm run dev` · `npm run dev:miniapp` · `npm run dev:admin` · `npm run tunnel`
 
 **Ishga tushirishdan oldin tekshirish:**
 
@@ -95,7 +97,7 @@ To'xtatish: `Ctrl + C` (uchalasi birga to'xtaydi).
 npm run doctor
 ```
 
-Bu buyruq `.env`, baza, bot tokeni, ngrok va portlarni tekshirib,
+Bu buyruq `.env`, baza, bot tokeni, tunnel va portlarni tekshirib,
 nima yetishmayotganini va nima qilish kerakligini aytadi.
 
 Admin Panel: http://localhost:5174 (parol — `.env` dagi `ADMIN_PASSWORD`)
@@ -128,36 +130,44 @@ Yangi buyurtmalar  →  Tayyorlanmoqda  →  Yo'lda / Olib ketishga tayyor  → 
 
 ---
 
-## 5. ngrok orqali Telegramga ulash
+## 5. Telegramga ulash (HTTPS tunnel)
 
 Telegram Mini App **faqat HTTPS** manzil bilan ishlaydi, shuning uchun
-localhost'ni ngrok orqali internetga chiqaramiz.
+localhost'ni internetga chiqarish kerak. Buning uchun **Cloudflare tunneli**
+ishlatiladi — ro'yxatdan o'tish ham, token ham, hech qanday sozlash ham
+kerak emas.
 
-1. https://ngrok.com — ro'yxatdan o'ting, dasturni yuklab oling.
-2. Authtoken'ni ulang:
-   ```bash
-   ngrok config add-authtoken SIZNING_TOKENINGIZ
-   ```
-3. 4-terminalda Mini App portini tunnel qiling:
-   ```bash
-   ngrok http 5173
-   ```
-4. **Tamom.** Bot ngrok manzilini **o'zi topadi** — `.env` ni tahrirlash
-   va serverni qayta ishga tushirish shart emas.
+**Hech narsa qilish shart emas:** `npm start` tunnelni ham o'zi ishga
+tushiradi. Birinchi safar kerakli dasturcha (`cloudflared`, ~40 MB)
+avtomatik yuklab olinadi va loyiha papkasiga saqlanadi.
 
-   Backend logida shunday yozuv chiqadi:
-   ```
-   🔗 ngrok topildi: https://a1b2-84-54.ngrok-free.app
-   ```
+Terminalda yashil `TUNNEL` qatorida manzil chiqadi:
 
-5. Botga `/start` yozing — **"Buyurtma berish"** tugmasi paydo bo'ladi.
+```
+[TUNNEL] ============================================
+[TUNNEL]  Mini App manzili: https://xxx-yyy-zzz.trycloudflare.com
+[TUNNEL]  Bot uni 20 soniya ichida o'zi topadi.
+[TUNNEL] ============================================
+```
 
-> ngrok'ni qayta ishga tushirsangiz manzil o'zgaradi, lekin bot buni
-> 20 soniya ichida o'zi sezadi va tugmani yangilaydi.
+So'ng botga `/start` yozing — **"Buyurtma berish"** tugmasi paydo bo'ladi.
 
-**Qanday ishlaydi:** ngrok o'z kompyuteringizda 4040-portda kichik API ochadi.
-Backend o'sha API'dan tunnel manzilini o'qiydi. Avtomatik topishni
-o'chirmoqchi bo'lsangiz, `.env` ga `AUTO_NGROK=false` yozing va
+> Tunnel qayta ishga tushsa manzil o'zgaradi, lekin bot buni 20 soniya
+> ichida o'zi sezadi va tugmani yangilaydi.
+
+**Qanday ishlaydi:** tunnel manzilni loyiha papkasidagi `.tunnel-url`
+fayliga yozadi, backend esa o'sha fayldan o'qiydi.
+
+**Alohida ishga tushirish** (backend allaqachon ishlab turgan bo'lsa):
+
+```bash
+npm run tunnel
+```
+
+**ngrok ishlatmoqchi bo'lsangiz** — u ham ishlayveradi. `ngrok http 5173`
+deb ishga tushiring, backend uni 4040-portdagi API orqali o'zi topadi.
+
+**Avtomatik topishni o'chirish:** `.env` ga `AUTO_TUNNEL=false` yozing va
 `WEB_APP_URL` ni qo'lda kiriting.
 
 ---

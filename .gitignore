@@ -13,3 +13,9 @@ prisma/migrations/dev.db*
 # Yuklangan suratlar (bazada yo'llari saqlanadi)
 uploads/*
 !uploads/.gitkeep
+
+# Tunnel (Cloudflare) — har safar yangi manzil
+.tunnel-url
+cloudflared
+cloudflared.exe
+cloudflared*.part

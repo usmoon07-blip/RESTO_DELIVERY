@@ -85,9 +85,9 @@ const DICT = {
 
     devWarning:
       '<b>Eslatma (faqat siz ko\'rasiz):</b>\n\n' +
-      "Mini App tugmasi hali yo'q. Kompyuterda <b>ngrok</b> ni ishga tushiring:\n" +
-      '<code>ngrok http 5173</code>\n\n' +
-      "Bot uni o'zi topadi — hech narsani tahrirlash shart emas. " +
+      "Mini App tugmasi hali yo'q — tunnel hali ulanmagan.\n\n" +
+      "<b>RESTO.bat</b> oynasida yashil <b>TUNNEL</b> qatorini kuting: u manzilni " +
+      "o'zi topadi (birinchi marta 1-2 daqiqa vaqt olishi mumkin).\n\n" +
       "So'ng /start ni qayta bosing.",
 
     orderAccepted: '<b>Buyurtmangiz muvaffaqiyatli qabul qilindi!</b>',
@@ -196,9 +196,9 @@ const DICT = {
 
     devWarning:
       '<b>Заметка (видите только вы):</b>\n\n' +
-      'Кнопки Mini App пока нет. Запустите на компьютере <b>ngrok</b>:\n' +
-      '<code>ngrok http 5173</code>\n\n' +
-      'Бот найдёт его сам — ничего редактировать не нужно. ' +
+      'Кнопки Mini App пока нет — туннель ещё не подключился.\n\n' +
+      'В окне <b>RESTO.bat</b> дождитесь зелёной строки <b>TUNNEL</b>: адрес ' +
+      'определится сам (в первый раз может занять 1-2 минуты).\n\n' +
       'Затем нажмите /start снова.',
 
     orderAccepted: '<b>Ваш заказ успешно принят!</b>',
@@ -307,9 +307,9 @@ const DICT = {
 
     devWarning:
       '<b>Note (only you can see this):</b>\n\n' +
-      'The Mini App button is not available yet. Start <b>ngrok</b> on your computer:\n' +
-      '<code>ngrok http 5173</code>\n\n' +
-      'The bot will find it automatically — nothing to edit. ' +
+      'The Mini App button is not available yet — the tunnel is not up.\n\n' +
+      'In the <b>RESTO.bat</b> window wait for the green <b>TUNNEL</b> line: the ' +
+      'address is detected automatically (the first run may take 1-2 minutes).\n\n' +
       'Then press /start again.',
 
     orderAccepted: '<b>Your order has been accepted!</b>',

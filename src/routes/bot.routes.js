@@ -2,7 +2,7 @@ import bot from '../core/bot.js';
 import config from '../config/default.js';
 import botController, { matchesButton } from '../controllers/botController.js';
 import {
-  detectNgrokUrl,
+  detectPublicUrl,
   getWebAppUrl,
   isHttps,
   setWebAppUrl,
@@ -65,20 +65,20 @@ async function syncMenuButton() {
 }
 
 /**
- * ngrok manzilini topib qo'yadi. Topilsa — `.env` ni qo'lda tahrirlash
- * va serverni qayta ishga tushirish shart emas.
+ * Tunnel manzilini topib qo'yadi (Cloudflare yoki ngrok). Topilsa — `.env` ni
+ * qo'lda tahrirlash va serverni qayta ishga tushirish shart emas.
  */
 export async function refreshWebAppUrl({ quiet = false } = {}) {
-  if (!config.bot.autoNgrok) return getWebAppUrl();
+  if (!config.bot.autoTunnel) return getWebAppUrl();
 
   // .env da allaqachon https manzil turgan bo'lsa, unga tegmaymiz
   if (isHttps(config.bot.webAppUrl)) return getWebAppUrl();
 
-  const found = await detectNgrokUrl(config.bot.webAppPort);
+  const found = await detectPublicUrl(config.bot.webAppPort);
   if (!found) return getWebAppUrl();
 
   if (setWebAppUrl(found)) {
-    console.log(`🔗 ngrok topildi: ${found}`);
+    console.log(`🔗 Mini App manzili topildi: ${found}`);
     await syncMenuButton();
   } else if (!quiet) {
     console.log(`🔗 Mini App: ${found}`);
@@ -104,8 +104,8 @@ export async function launchBot() {
     console.warn('⚠️  Buyruqlar sozlanmadi:', error.message);
   }
 
-  // ngrok keyinroq ishga tushsa ham o'zi ulanib oladi
-  if (config.bot.autoNgrok && !isHttps(config.bot.webAppUrl)) {
+  // Tunnel keyinroq ishga tushsa ham bot o'zi ulanib oladi
+  if (config.bot.autoTunnel && !isHttps(config.bot.webAppUrl)) {
     setInterval(() => refreshWebAppUrl({ quiet: true }), 20000).unref();
   }
 
@@ -120,7 +120,7 @@ export async function launchBot() {
 
   if (!isHttps(getWebAppUrl())) {
     console.log(
-      '⚠️  Mini App tugmasi hali yo\'q — ngrok ishga tushsa, bot uni o\'zi topadi',
+      '⚠️  Mini App tugmasi hali yo\'q — tunnel ishga tushsa, bot uni o\'zi topadi',
     );
   }
 
