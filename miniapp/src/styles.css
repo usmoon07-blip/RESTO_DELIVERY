@@ -1084,6 +1084,30 @@ ul {
   color: var(--brand-dark);
 }
 
+/* Ikkinchi darajali amal — "Bekor qilish" asosiy amaldan ajralib tursin */
+.link--muted {
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+.link:disabled {
+  opacity: 0.5;
+}
+
+.ocard__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+  margin-left: auto; /* o'ralganda ham o'ng tomonda tursin */
+}
+
+/* Summa va tugmalar ikki qatorga bo'linib ketmasin */
+.ocard__total,
+.ocard__actions .link {
+  white-space: nowrap;
+}
+
 /* ============================== SAVATCHA ============================== */
 .citem {
   display: flex;
@@ -1569,7 +1593,8 @@ textarea.input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
   padding-top: 11px;
   border-top: 1px solid var(--line);
 }

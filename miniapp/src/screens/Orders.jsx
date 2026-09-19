@@ -1,8 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
+import api from '../api.js';
 import { formatDate, formatSum } from '../utils.js';
 import { haptic } from '../telegram.js';
 import { IconReceipt } from '../components/Icons.jsx';
+
+/** Oshxona tayyorlashni boshlamaguncha bekor qilsa bo'ladi (backend bilan bir xil) */
+const CANCELLABLE = ['PENDING', 'CONFIRMED'];
 
 export default function Orders({ onGoMenu, onGoCart }) {
   const {
@@ -15,6 +19,8 @@ export default function Orders({ onGoMenu, onGoCart }) {
     showToast,
     t,
   } = useApp();
+
+  const [cancelling, setCancelling] = useState(null);
 
   useEffect(() => {
     refreshOrders();
@@ -40,6 +46,23 @@ export default function Orders({ onGoMenu, onGoCart }) {
 
     showToast(t('reorderDone'));
     onGoCart();
+  };
+
+  const cancel = async (order) => {
+    if (!confirm(t('cancelAsk', order.id))) return;
+
+    haptic('warning');
+    setCancelling(order.id);
+
+    try {
+      await api.cancelOrder(order.id);
+      await refreshOrders();
+      showToast(t('cancelDone'));
+    } catch (e) {
+      showToast(e.message);
+    } finally {
+      setCancelling(null);
+    }
   };
 
   return (
@@ -86,9 +109,20 @@ export default function Orders({ onGoMenu, onGoCart }) {
                 <div className="ocard__total">
                   {formatSum(order.total)} {t('currency')}
                 </div>
-                <button className="link" onClick={() => reorder(order)}>
-                  {t('reorder')}
-                </button>
+                <div className="ocard__actions">
+                  {CANCELLABLE.includes(order.status) && (
+                    <button
+                      className="link link--muted"
+                      disabled={cancelling === order.id}
+                      onClick={() => cancel(order)}
+                    >
+                      {cancelling === order.id ? t('cancelling') : t('cancelOrder')}
+                    </button>
+                  )}
+                  <button className="link" onClick={() => reorder(order)}>
+                    {t('reorder')}
+                  </button>
+                </div>
               </div>
             </div>
           ))

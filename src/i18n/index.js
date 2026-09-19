@@ -53,6 +53,19 @@ const DICT = {
 
     noOrders: "Sizda hali buyurtmalar yo'q.\n\nBirinchi buyurtmangizni bering!",
     ordersTitle: "<b>So'nggi buyurtmalaringiz:</b>",
+
+    btnCancelOrder: (id) => `#${id} — bekor qilish`,
+    cancelAsk: (id) =>
+      `<b>#${id}</b> buyurtmani rostdan bekor qilamizmi?\n\nBu amalni ortga qaytarib bo'lmaydi.`,
+    cancelYes: 'Ha, bekor qilinsin',
+    cancelNo: "Yo'q",
+    cancelDone: (id) =>
+      `<b>#${id}</b> buyurtma bekor qilindi.\n\nBizni tanlaganingiz uchun rahmat — sizni yana kutamiz.`,
+    cancelTooLate:
+      "Bu buyurtma allaqachon tayyorlanmoqda, shuning uchun ilovadan bekor qilib bo'lmaydi.\n\n" +
+      'Iltimos, restoranga qo\'ng\'iroq qiling — yordam beramiz.',
+    cancelAlready: 'Bu buyurtma allaqachon bekor qilingan.',
+    cancelNotFound: 'Buyurtma topilmadi.',
     startFirst: "Avval /start buyrug'ini bosing.",
 
     about: (restaurant, fee, free) =>
@@ -164,6 +177,19 @@ const DICT = {
 
     noOrders: 'У вас пока нет заказов.\n\nСделайте свой первый заказ!',
     ordersTitle: '<b>Ваши последние заказы:</b>',
+
+    btnCancelOrder: (id) => `#${id} — отменить`,
+    cancelAsk: (id) =>
+      `Точно отменить заказ <b>#${id}</b>?\n\nЭто действие нельзя отменить.`,
+    cancelYes: 'Да, отменить',
+    cancelNo: 'Нет',
+    cancelDone: (id) =>
+      `Заказ <b>#${id}</b> отменён.\n\nСпасибо, что выбрали нас — будем рады видеть вас снова.`,
+    cancelTooLate:
+      'Этот заказ уже готовится, поэтому отменить его из приложения нельзя.\n\n' +
+      'Пожалуйста, позвоните в ресторан — мы поможем.',
+    cancelAlready: 'Этот заказ уже отменён.',
+    cancelNotFound: 'Заказ не найден.',
     startFirst: 'Сначала нажмите /start.',
 
     about: (restaurant, fee, free) =>
@@ -275,6 +301,19 @@ const DICT = {
 
     noOrders: "You don't have any orders yet.\n\nPlace your first order!",
     ordersTitle: '<b>Your recent orders:</b>',
+
+    btnCancelOrder: (id) => `#${id} — cancel`,
+    cancelAsk: (id) =>
+      `Cancel order <b>#${id}</b>?\n\nThis cannot be undone.`,
+    cancelYes: 'Yes, cancel it',
+    cancelNo: 'No',
+    cancelDone: (id) =>
+      `Order <b>#${id}</b> has been cancelled.\n\nThank you for choosing us — we hope to see you again.`,
+    cancelTooLate:
+      'This order is already being prepared, so it cannot be cancelled from the app.\n\n' +
+      'Please call the restaurant and we will help.',
+    cancelAlready: 'This order has already been cancelled.',
+    cancelNotFound: 'Order not found.',
     startFirst: 'Please press /start first.',
 
     about: (restaurant, fee, free) =>

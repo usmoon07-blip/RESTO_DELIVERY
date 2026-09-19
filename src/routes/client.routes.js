@@ -17,5 +17,6 @@ router.post('/me/phone', telegramAuth, cartController.savePhone);
 router.post('/me/language', telegramAuth, cartController.saveLanguage);
 router.get('/orders', telegramAuth, cartController.getMyOrders);
 router.post('/orders', telegramAuth, cartController.createOrder);
+router.post('/orders/:id/cancel', telegramAuth, cartController.cancelOrder);
 
 export default router;

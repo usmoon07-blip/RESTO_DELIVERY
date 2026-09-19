@@ -127,6 +127,36 @@ Admin Panelda 4 ta bo'lim bor:
 | **Buyurtmalar** | Menejer | To'liq jadval, filtr, statistika, tushum |
 | **Mahsulotlar** | Menejer | Taom qo'shish / tahrirlash / surat yuklash |
 | **Promokodlar** | Menejer | Chegirma kodlari |
+| **Hisobot** | Egasi / menejer | Tushum, to'lov turlari, top taomlar, top mijozlar |
+
+### Hisobot bo'limi
+
+Davr tanlanadi: **Bugun · 7 kun · 30 kun · 90 kun · Hammasi**.
+
+| Ko'rsatkich | Ma'nosi |
+|---|---|
+| Tushum | Bekor qilinmagan barcha buyurtmalar summasi |
+| Qo'lga tekkan pul | Faqat **yetkazilgan** buyurtmalar — aniq olingan pul |
+| O'rtacha chek | Bitta buyurtmaga to'g'ri keladigan summa |
+| Bekor qilingan | Soni va ulushi (15% dan oshsa qizil rangda) |
+| To'lov turi | Naqd / karta — nechta va qancha summa |
+| Yetkazish turi | Yetkazib berish / borib olish |
+| Kunlik tushum | Kunlar bo'yicha ustunli grafik |
+| Kun davomida | Qaysi soatlarda ko'p buyurtma tushadi (smena rejasi uchun) |
+| Eng ko'p sotilgan taomlar | Menyu va xarid rejasi uchun |
+| Eng qadrli mijozlar | Jami xaridi bo'yicha 10 ta mijoz |
+
+> Taomlar **id bo'yicha** guruhlanadi, nomi bo'yicha emas — bitta taom
+> uch tilda uch marta sanalmasligi uchun.
+
+### Buyurtmani bekor qilish
+
+Mijoz o'z buyurtmasini **botdan** ham, **Mini App'dan** ham bekor qila oladi —
+lekin faqat oshxona tayyorlashni boshlamaguncha (`Kutilmoqda` va `Tasdiqlandi`
+holatlarida). Undan keyin tugma ko'rinmaydi va mijozga restoranga qo'ng'iroq
+qilish taklif qilinadi.
+
+Botda bekor qilish **ikki bosqichli**: tugma bosilganda avval tasdiq so'raladi.
 
 ### Oshxona ekrani qanday ishlaydi
 

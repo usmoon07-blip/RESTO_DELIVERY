@@ -19,6 +19,11 @@ export function registerBotHandlers() {
   // Til tanlash tugmasi
   bot.action(/^lang:(UZ|RU|EN)$/, botController.onLanguageChosen);
 
+  // Buyurtmani bekor qilish: so'rash -> tasdiqlash
+  bot.action(/^cancel:(\d+)$/, botController.onCancelAsk);
+  bot.action(/^cancelYes:(\d+)$/, botController.onCancelConfirm);
+  bot.action('cancelNo', botController.onCancelDismiss);
+
   bot.on('contact', botController.onContact);
 
   // Tugmalar uch tilda bo'lgani uchun matn bo'yicha aniqlanadi

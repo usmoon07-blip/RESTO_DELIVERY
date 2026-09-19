@@ -4,6 +4,7 @@ import Orders from './pages/Orders.jsx';
 import Products from './pages/Products.jsx';
 import Kitchen from './pages/Kitchen.jsx';
 import Promos from './pages/Promos.jsx';
+import Report from './pages/Report.jsx';
 import Logo from './components/Logo.jsx';
 import { clearPassword, getPassword } from './api.js';
 
@@ -50,6 +51,12 @@ export default function App() {
           >
             Promokodlar
           </button>
+          <button
+            className={`tab ${page === 'report' ? 'tab--active' : ''}`}
+            onClick={() => setPage('report')}
+          >
+            Hisobot
+          </button>
         </nav>
 
         <button className="btn btn--light btn--sm" onClick={logout}>
@@ -61,6 +68,7 @@ export default function App() {
       {page === 'orders' && <Orders onAuthError={logout} />}
       {page === 'products' && <Products onAuthError={logout} />}
       {page === 'promos' && <Promos onAuthError={logout} />}
+      {page === 'report' && <Report onAuthError={logout} />}
     </div>
   );
 }

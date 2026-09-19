@@ -145,6 +145,10 @@ const UZ = {
   noOrdersText: 'Birinchi buyurtmangizni bering — tarix shu yerda saqlanadi',
   orderNo: (id) => `Buyurtma #${id}`,
   reorder: 'Yana buyurtma qilish',
+  cancelOrder: 'Bekor qilish',
+  cancelAsk: (id) => `#${id} buyurtmani bekor qilamizmi?`,
+  cancelDone: 'Buyurtma bekor qilindi',
+  cancelling: 'Bekor qilinmoqda...',
   reorderDone: "Savatga qo'shildi",
   reorderMissing: "Bu taomlar hozir menyuda yo'q",
 
@@ -308,6 +312,10 @@ const RU = {
   noOrdersText: 'Сделайте первый заказ — история появится здесь',
   orderNo: (id) => `Заказ #${id}`,
   reorder: 'Заказать снова',
+  cancelOrder: 'Отменить',
+  cancelAsk: (id) => `Отменить заказ #${id}?`,
+  cancelDone: 'Заказ отменён',
+  cancelling: 'Отменяем...',
   reorderDone: 'Добавлено в корзину',
   reorderMissing: 'Этих блюд сейчас нет в меню',
 
@@ -465,6 +473,10 @@ const EN = {
   noOrdersText: 'Place your first order — history will appear here',
   orderNo: (id) => `Order #${id}`,
   reorder: 'Order again',
+  cancelOrder: 'Cancel',
+  cancelAsk: (id) => `Cancel order #${id}?`,
+  cancelDone: 'Order cancelled',
+  cancelling: 'Cancelling...',
   reorderDone: 'Added to cart',
   reorderMissing: 'These dishes are not on the menu right now',
 

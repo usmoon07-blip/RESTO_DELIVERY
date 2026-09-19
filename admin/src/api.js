@@ -76,6 +76,7 @@ export const api = {
     }),
 
   getStats: () => request('/stats'),
+  getReport: (days) => request(`/report?days=${days}`),
 
   getOrders: (status) =>
     request(`/orders${status ? `?status=${status}` : ''}`),

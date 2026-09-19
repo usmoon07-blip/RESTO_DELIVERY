@@ -53,6 +53,8 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(order),
     }),
+  cancelOrder: (id) =>
+    request(`/client/orders/${id}/cancel`, { method: 'POST' }),
 };
 
 export default api;

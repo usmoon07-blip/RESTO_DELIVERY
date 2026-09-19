@@ -159,6 +159,31 @@ export async function getMyOrders(req, res, next) {
  * POST /api/client/orders — buyurtmani qabul qilish
  * Narxlar mijoz tomonidan emas, bazadan olinadi (xavfsizlik uchun).
  */
+/** POST /api/client/orders/:id/cancel — mijoz o'z buyurtmasini bekor qiladi */
+export async function cancelOrder(req, res, next) {
+  try {
+    const lang = req.user.language;
+    const result = await OrderModel.cancelByUser(req.params.id, req.user.id);
+
+    if (!result.ok) {
+      const errors = {
+        NOT_FOUND: { status: 404, key: 'cancelNotFound' },
+        ALREADY: { status: 409, key: 'cancelAlready' },
+        TOO_LATE: { status: 409, key: 'cancelTooLate' },
+      };
+      const e = errors[result.reason];
+      return res.status(e.status).json({ ok: false, error: t(lang, e.key) });
+    }
+
+    // Botdan tasdiq — mijoz Mini App'ni yopsa ham xabar qoladi
+    sendMessageSafe(req.user.telegramId, t(lang, 'cancelDone', result.order.id));
+
+    res.json({ ok: true, data: result.order });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function createOrder(req, res, next) {
   try {
     const {
@@ -318,7 +343,19 @@ export async function createOrder(req, res, next) {
       .join('\n');
 
     if (!req.isDevUser) {
-      await sendMessageSafe(req.user.telegramId, message);
+      // Xabar ostida darhol bekor qilish tugmasi
+      await sendMessageSafe(req.user.telegramId, message, {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: t(lang, 'btnCancelOrder', order.id),
+                callback_data: `cancel:${order.id}`,
+              },
+            ],
+          ],
+        },
+      });
 
       if (order.latitude != null && order.longitude != null) {
         await sendMessageSafe(req.user.telegramId, t(lang, 'orderLocation'));
@@ -353,4 +390,5 @@ export default {
   checkPromo,
   getMyOrders,
   createOrder,
+  cancelOrder,
 };

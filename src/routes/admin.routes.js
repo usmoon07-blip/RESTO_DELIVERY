@@ -10,6 +10,7 @@ router.use(adminAuth);
 
 router.post('/login', adminController.login);
 router.get('/stats', adminController.getStats);
+router.get('/report', adminController.getReport);
 
 // Buyurtmalar
 router.get('/orders', adminController.getOrders);

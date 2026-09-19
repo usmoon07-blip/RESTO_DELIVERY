@@ -41,6 +41,38 @@ export const OrderModel = {
     });
   },
 
+  /**
+   * Mijozning o'z buyurtmasini bekor qilishi.
+   * Oshxona tayyorlashni boshlagandan keyin bekor qilib bo'lmaydi —
+   * mahsulot allaqachon sarflangan bo'ladi.
+   */
+  CANCELLABLE: ['PENDING', 'CONFIRMED'],
+
+  async cancelByUser(orderId, userId) {
+    const order = await prisma.order.findUnique({
+      where: { id: Number(orderId) },
+      include: { user: true },
+    });
+
+    if (!order || order.userId !== Number(userId)) {
+      return { ok: false, reason: 'NOT_FOUND' };
+    }
+    if (order.status === 'CANCELLED') {
+      return { ok: false, reason: 'ALREADY', order };
+    }
+    if (!OrderModel.CANCELLABLE.includes(order.status)) {
+      return { ok: false, reason: 'TOO_LATE', order };
+    }
+
+    const updated = await prisma.order.update({
+      where: { id: order.id },
+      data: { status: 'CANCELLED' },
+      include: { user: true },
+    });
+
+    return { ok: true, order: updated };
+  },
+
   updateStatus(id, status) {
     return prisma.order.update({
       where: { id: Number(id) },

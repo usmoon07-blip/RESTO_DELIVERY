@@ -1,5 +1,6 @@
 import ProductModel from '../models/Product.js';
 import OrderModel from '../models/Order.js';
+import ReportModel from '../models/Report.js';
 import UserModel from '../models/User.js';
 import PromoCodeModel from '../models/PromoCode.js';
 import { sendMessageSafe } from '../core/bot.js';
@@ -26,6 +27,19 @@ export async function getStats(req, res, next) {
       ok: true,
       data: { ...orderStats, totalProducts: products, totalUsers: users },
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/** GET /api/admin/report?days=1|7|30|0 — 0 yoki bo'sh = butun davr */
+export async function getReport(req, res, next) {
+  try {
+    const allowed = [1, 7, 30, 90];
+    const raw = Number(req.query.days);
+    const days = allowed.includes(raw) ? raw : raw === 0 ? null : 30;
+
+    res.json({ ok: true, data: await ReportModel.build(days) });
   } catch (error) {
     next(error);
   }
@@ -335,6 +349,7 @@ export async function getUsers(req, res, next) {
 export default {
   login,
   getStats,
+  getReport,
   getOrders,
   getOrder,
   updateOrderStatus,

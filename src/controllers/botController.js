@@ -177,7 +177,75 @@ export async function onMyOrders(ctx) {
     })
     .join('\n\n');
 
-  await ctx.replyWithHTML(`${t(lang, 'ordersTitle')}\n\n${text}`);
+  // Bekor qilinishi mumkin bo'lgan buyurtmalar uchun tugma
+  const cancellable = orders.filter((o) => OrderModel.CANCELLABLE.includes(o.status));
+  const keyboard = cancellable.length
+    ? {
+        reply_markup: {
+          inline_keyboard: cancellable.map((o) => [
+            { text: t(lang, 'btnCancelOrder', o.id), callback_data: `cancel:${o.id}` },
+          ]),
+        },
+      }
+    : undefined;
+
+  await ctx.replyWithHTML(`${t(lang, 'ordersTitle')}\n\n${text}`, keyboard);
+}
+
+/** Bekor qilish tugmasi bosildi — avval tasdiqlaymiz */
+export async function onCancelAsk(ctx) {
+  const id = Number(ctx.match[1]);
+  const lang = await langOf(ctx);
+
+  await ctx.answerCbQuery();
+  await ctx.replyWithHTML(t(lang, 'cancelAsk', id), {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: t(lang, 'cancelYes'), callback_data: `cancelYes:${id}` }],
+        [{ text: t(lang, 'cancelNo'), callback_data: 'cancelNo' }],
+      ],
+    },
+  });
+}
+
+/** Tasdiqlandi — buyurtma bekor qilinadi */
+export async function onCancelConfirm(ctx) {
+  const id = Number(ctx.match[1]);
+  const user = await UserModel.findByTelegramId(ctx.from.id);
+  if (!user) return ctx.answerCbQuery();
+
+  const lang = user.language;
+  const result = await OrderModel.cancelByUser(id, user.id);
+
+  const messages = {
+    NOT_FOUND: 'cancelNotFound',
+    ALREADY: 'cancelAlready',
+    TOO_LATE: 'cancelTooLate',
+  };
+
+  await ctx.answerCbQuery();
+  await removeKeyboard(ctx);
+
+  if (!result.ok) {
+    return ctx.replyWithHTML(t(lang, messages[result.reason]));
+  }
+
+  return ctx.replyWithHTML(t(lang, 'cancelDone', id));
+}
+
+/** "Yo'q" — hech narsa qilmaymiz */
+export async function onCancelDismiss(ctx) {
+  await ctx.answerCbQuery();
+  await removeKeyboard(ctx);
+}
+
+/** Tugmalarni olib tashlaymiz — ikki marta bosilmasin */
+async function removeKeyboard(ctx) {
+  try {
+    await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
+  } catch {
+    /* xabar o'chirilgan yoki eski bo'lsa — muammo emas */
+  }
 }
 
 /** Biz haqimizda */
@@ -219,6 +287,9 @@ export default {
   onContact,
   onRequestPhone,
   onMyOrders,
+  onCancelAsk,
+  onCancelConfirm,
+  onCancelDismiss,
   onAbout,
   onHelp,
   onFallback,
