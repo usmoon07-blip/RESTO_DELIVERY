@@ -1,0 +1,57 @@
+# Render uchun tayyor sozlama.
+# Render'da "New +" -> "Blueprint" -> shu omborni tanlasangiz,
+# hamma narsa shu fayldan o'qiladi.
+services:
+  - type: web
+    name: resto-api
+    runtime: node
+    plan: free
+    region: frankfurt # Toshkentga eng yaqin mintaqa
+    branch: claude/friendly-shannon-9i984v
+
+    # db push jadvallarni yaratadi/yangilaydi. --accept-data-loss QO'YILMAGAN:
+    # agar o'zgarish ma'lumot yo'qotishga olib kelsa, deploy to'xtaydi —
+    # buyurtmalar jimgina o'chib ketmasligi uchun.
+    buildCommand: npm install && npx prisma generate && npx prisma db push --skip-generate
+    startCommand: node src/index.js
+
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+
+      # --- Quyidagilarni Render panelida o'zingiz kiritasiz ---
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+
+      # Mini App manzili (Vercel) — bot tugmasi shu manzilni ochadi
+      - key: WEB_APP_URL
+        sync: false
+      # Mini App va Admin Panel manzillari, vergul bilan
+      - key: CORS_ORIGINS
+        sync: false
+
+      # Brauzerda initData tekshiruvisiz kirishga ruxsat bermaymiz
+      - key: ALLOW_BROWSER_DEV
+        value: "false"
+
+      # --- Biznes sozlamalari ---
+      - key: CURRENCY
+        value: "so'm"
+      - key: DELIVERY_FEE
+        value: "15000"
+      - key: FREE_DELIVERY_FROM
+        value: "150000"
+      - key: RESTAURANT_NAME
+        value: Resto

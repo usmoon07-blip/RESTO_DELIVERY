@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import bot from '../core/bot.js';
 import config from '../config/default.js';
 import botController, { matchesButton } from '../controllers/botController.js';
@@ -142,8 +143,48 @@ function shout(title, lines) {
   console.error('');
 }
 
-/** Botni ishga tushirish (localhost uchun long polling) */
-export async function launchBot() {
+/**
+ * Webhook manzilini token asosida yasaymiz — tashqi odam topa olmasin.
+ * Token o'zi manzilga tushmaydi, faqat uning hash'i.
+ */
+function webhookPath() {
+  const hash = crypto.createHash('sha256').update(config.bot.token).digest('hex');
+  return `/telegram/${hash.slice(0, 32)}`;
+}
+
+/**
+ * Serverda (Render) long polling emas, webhook ishlatiladi:
+ * Telegram xabarni o'zi serverga yuboradi, server esa uxlab qolsa
+ * shu so'rov bilan uyg'onadi.
+ *
+ * @returns {Promise<Function|null>} Express middleware yoki null (localhost)
+ */
+export async function setupWebhook() {
+  const base = config.deploy.publicUrl;
+  if (!isHttps(base)) return null; // localhost — long polling ishlatiladi
+
+  const path = webhookPath();
+
+  // Telegram so'rovni rostdan yuborganini tekshirish uchun maxfiy kalit
+  const secretToken = crypto
+    .createHash('sha256')
+    .update(`${config.bot.token}:webhook`)
+    .digest('hex')
+    .slice(0, 48);
+
+  const middleware = await bot.createWebhook({
+    domain: base,
+    path,
+    secret_token: secretToken,
+    drop_pending_updates: true,
+  });
+
+  console.log(`🔗 Webhook: ${base}${path}`);
+  return middleware;
+}
+
+/** Botni ishga tushirish */
+export async function launchBot({ webhookReady = false } = {}) {
   registerBotHandlers();
 
   await refreshWebAppUrl({ quiet: true });
@@ -164,11 +205,14 @@ export async function launchBot() {
     setInterval(() => refreshWebAppUrl({ quiet: true }), 20000).unref();
   }
 
-  // `launch()` promise'i bot to'xtaguncha yopilmaydi — shuning uchun `await` qilmaymiz.
-  // Xatolikni ushlamasak, butun server qulab tushadi.
-  bot.launch({ dropPendingUpdates: true }).catch((error) => {
-    shout('BOT XABARLARNI QABUL QILMAYAPTI', explainTelegramError(error));
-  });
+  if (!webhookReady) {
+    // Localhost: long polling.
+    // `launch()` promise'i bot to'xtaguncha yopilmaydi — shuning uchun `await`
+    // qilmaymiz. Xatolikni ushlamasak, butun server qulab tushadi.
+    bot.launch({ dropPendingUpdates: true }).catch((error) => {
+      shout('BOT XABARLARNI QABUL QILMAYAPTI', explainTelegramError(error));
+    });
+  }
 
   let me;
   try {
@@ -178,7 +222,7 @@ export async function launchBot() {
     throw error;
   }
 
-  console.log(`🤖 Bot ishga tushdi: @${me.username}`);
+  console.log(`🤖 Bot ishga tushdi: @${me.username} (${webhookReady ? 'webhook' : 'polling'})`);
   console.log(`   Telegramda oching: https://t.me/${me.username}`);
 
   if (!isHttps(getWebAppUrl())) {
@@ -190,4 +234,4 @@ export async function launchBot() {
   return me;
 }
 
-export default { registerBotHandlers, launchBot };
+export default { registerBotHandlers, launchBot, setupWebhook };

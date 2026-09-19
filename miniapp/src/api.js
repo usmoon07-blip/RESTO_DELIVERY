@@ -2,6 +2,23 @@ import { initData } from './telegram.js';
 
 const BASE = import.meta.env.VITE_API_URL || '/api';
 
+/**
+ * Suratlar manzili.
+ *
+ * Bazada `/uploads/xxx.jpg` ko'rinishida saqlanadi — bu localhostda ishlaydi,
+ * lekin serverda sayt (Vercel) va suratlar (Render) boshqa-boshqa manzilda
+ * turadi. Shuning uchun nisbiy yo'lga API manzilini qo'shamiz.
+ */
+const MEDIA_ORIGIN = BASE.replace(/\/api\/?$/, '');
+
+export function mediaUrl(url) {
+  if (!url) return '';
+  if (/^(https?:|data:|blob:)/i.test(url)) return url; // allaqachon to'liq
+  if (!MEDIA_ORIGIN) return url; // localhost — Vite proxy o'zi hal qiladi
+  return `${MEDIA_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
+
 async function request(path, options = {}) {
   const response = await fetch(`${BASE}${path}`, {
     ...options,

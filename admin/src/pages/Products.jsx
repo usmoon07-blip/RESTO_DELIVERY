@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import api from '../api.js';
+import api, { mediaUrl } from '../api.js';
 import { formatSum, onImageError } from '../utils.js';
 
 const EMPTY = {
@@ -168,7 +168,7 @@ function ProductModal({ product, onClose, onSaved }) {
           <div className="upload">
             <div className="upload__preview">
               {form.imageUrl ? (
-                <img src={form.imageUrl} alt="" onError={onImageError} />
+                <img src={mediaUrl(form.imageUrl)} alt="" onError={onImageError} />
               ) : (
                 <span className="upload__empty">Surat yo'q</span>
               )}
@@ -421,7 +421,7 @@ export default function Products({ onAuthError }) {
                   <td>
                     <img
                       className="thumb"
-                      src={product.imageUrl}
+                      src={mediaUrl(product.imageUrl)}
                       alt={product.name}
                       onError={onImageError}
                     />

@@ -1,7 +1,10 @@
 # 🍕 Resto — Telegram Mini App + Admin Panel
 
 Telegram bot, mijozlar uchun Mini App va ma'murlar uchun Admin Panel.
-Butunlay **localhost**da ishlaydi, hech qayerga deploy qilish shart emas.
+Kompyuterda ham (`RESTO.bat`), serverda ham ishlaydi.
+
+> **Serverga yuklash:** [DEPLOY.md](DEPLOY.md) — qadamba-qadam qo'llanma
+> (backend Render'da, Mini App va Admin Panel Vercel'da, hammasi bepul).
 
 | Qism | Texnologiya | Manzil |
 |---|---|---|

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 import { formatSum } from '../utils.js';
 import { haptic } from '../telegram.js';
-import api from '../api.js';
+import api, { mediaUrl } from '../api.js';
 import { Placeholder } from '../components/ProductCard.jsx';
 import { productName } from '../i18n.js';
 import {
@@ -107,7 +107,7 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
           <div className="citem" key={item.productId}>
             <div className="citem__media">
               {item.imageUrl ? (
-                <img src={item.imageUrl} alt={item.name} />
+                <img src={mediaUrl(item.imageUrl)} alt={item.name} />
               ) : (
                 <Placeholder />
               )}
@@ -138,7 +138,7 @@ export default function CartScreen({ onGoMenu, onCheckout }) {
           <div className="upsell">
             <div className="upsell__media">
               {upsell.imageUrl ? (
-                <img src={upsell.imageUrl} alt={upsell.name} />
+                <img src={mediaUrl(upsell.imageUrl)} alt={upsell.name} />
               ) : (
                 <Placeholder />
               )}

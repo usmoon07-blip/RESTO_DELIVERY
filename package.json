@@ -1,12 +1,16 @@
 {
   "name": "resto-delivery-backend",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "type": "module",
   "description": "Premium Pizza — Telegram Bot + Mini App API + Admin API",
   "main": "src/index.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "node --watch src/index.js",
+    "start:prod": "node src/index.js",
     "prestart": "node scripts/free-ports.js",
     "start": "concurrently -n \"BACKEND,MINIAPP,ADMIN,TUNNEL\" -c \"yellow,cyan,magenta,green\" \"npm:dev\" \"npm:dev:miniapp\" \"npm:dev:admin\" \"npm:tunnel\"",
     "db:push": "prisma db push",

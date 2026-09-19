@@ -88,13 +88,67 @@ export async function telegramAuth(req, res, next) {
 }
 
 /** Admin Panel API himoyasi — `x-admin-password` sarlavhasi orqali */
+/**
+ * Parolni tanlab ko'rishdan himoya.
+ *
+ * Admin Panel internetda ochiq turadi, shuning uchun bitta IP'dan
+ * ketma-ket noto'g'ri urinishlar cheklanadi. Ro'yxat xotirada turadi —
+ * server qayta ishga tushsa tozalanadi, bu yetarli.
+ */
+const MAX_FAILS = 8;
+const BLOCK_MS = 15 * 60 * 1000;
+const attempts = new Map(); // ip -> { fails, until }
+
+function clientIp(req) {
+  // Render/Vercel orqasida haqiqiy IP shu sarlavhada keladi
+  const forwarded = req.header('x-forwarded-for');
+  return (forwarded ? forwarded.split(',')[0] : req.ip || '').trim() || 'unknown';
+}
+
+/** Vaqti o'tgan yozuvlarni tozalaymiz — xotira o'smasin */
+function sweep(now) {
+  if (attempts.size < 500) return;
+  for (const [ip, row] of attempts) {
+    if (row.until < now && row.fails === 0) attempts.delete(ip);
+  }
+}
+
+/** Parol to'g'ri kelganini vaqtga bog'liq bo'lmagan usulda tekshiramiz */
+function samePassword(given, expected) {
+  const a = Buffer.from(String(given));
+  const b = Buffer.from(String(expected));
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
 export function adminAuth(req, res, next) {
+  const ip = clientIp(req);
+  const now = Date.now();
+  const row = attempts.get(ip) || { fails: 0, until: 0 };
+
+  if (row.until > now) {
+    const minutes = Math.ceil((row.until - now) / 60000);
+    return res.status(429).json({
+      ok: false,
+      error: `Juda ko'p urinish. ${minutes} daqiqadan keyin qayta urining.`,
+    });
+  }
+
   const password = req.header('x-admin-password');
 
-  if (!password || password !== config.admin.password) {
+  if (!password || !samePassword(password, config.admin.password)) {
+    row.fails += 1;
+    if (row.fails >= MAX_FAILS) {
+      row.until = now + BLOCK_MS;
+      row.fails = 0;
+      console.warn(`⚠️  ${ip} — ko'p marta noto'g'ri parol, 15 daqiqaga bloklandi`);
+    }
+    attempts.set(ip, row);
+    sweep(now);
     return res.status(401).json({ ok: false, error: "Parol noto'g'ri" });
   }
 
+  attempts.delete(ip); // to'g'ri parol — hisob tozalanadi
   next();
 }
 

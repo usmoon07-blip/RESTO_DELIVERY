@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { mediaUrl } from '../api.js';
 import { useApp } from '../context/AppContext.jsx';
 import { discountPercent, formatSum } from '../utils.js';
 import { productDescription, productIngredients, productName } from '../i18n.js';
@@ -46,7 +47,7 @@ export default function ProductSheet({ product, onClose }) {
           <div className="sheet__body">
             <div className="sheet__media">
               {product.imageUrl ? (
-                <img src={product.imageUrl} alt={name} />
+                <img src={mediaUrl(product.imageUrl)} alt={name} />
               ) : (
                 <Placeholder />
               )}

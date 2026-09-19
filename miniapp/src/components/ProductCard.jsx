@@ -1,4 +1,5 @@
 import { useApp } from '../context/AppContext.jsx';
+import { mediaUrl } from '../api.js';
 import { discountPercent, formatSum } from '../utils.js';
 import { productName } from '../i18n.js';
 import { IconDish, IconMinus, IconPlus } from './Icons.jsx';
@@ -24,7 +25,7 @@ export default function ProductCard({ product, onOpen }) {
         {product.imageUrl ? (
           <img
             className="pcard__img"
-            src={product.imageUrl}
+            src={mediaUrl(product.imageUrl)}
             alt={name}
             loading="lazy"
             onError={(e) => {

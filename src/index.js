@@ -5,7 +5,7 @@ import morgan from 'morgan';
 
 import config, { assertConfig } from './config/default.js';
 import { connectDatabase, disconnectDatabase } from './database/connection.js';
-import { launchBot } from './routes/bot.routes.js';
+import { launchBot, setupWebhook } from './routes/bot.routes.js';
 import { getWebAppUrl } from './core/webapp.js';
 import { VERSION } from './core/version.js';
 import bot from './core/bot.js';
@@ -18,7 +18,21 @@ assertConfig();
 const app = express();
 
 /* ----------------------------- Middleware ----------------------------- */
-app.use(cors({ origin: config.cors.origins, credentials: true }));
+/**
+ * Ishlab chiqarishda faqat ro'yxatdagi saytlarga ruxsat.
+ * Ro'yxat bo'sh bo'lsa (localhost) — hammasiga.
+ * Telegram Mini App ba'zan Origin yubormaydi, shuning uchun
+ * Origin'siz so'rovlar ham o'tkaziladi.
+ */
+const allowed = config.cors.origins;
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowed.length === 0) return callback(null, true);
+      callback(null, allowed.includes(origin.replace(/\/$/, '')));
+    },
+  }),
+);
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -49,18 +63,23 @@ app.get('/api/health', (req, res) => {
 app.use('/api/client', clientRoutes);
 app.use('/api/admin', adminRoutes);
 
-/* --------------------------- 404 va xatolar --------------------------- */
-app.use((req, res) => {
-  res.status(404).json({ ok: false, error: `Yo'l topilmadi: ${req.originalUrl}` });
-});
-
-app.use((error, req, res, next) => {
-  console.error('❌ Server xatosi:', error);
-  res.status(error.status || 500).json({
-    ok: false,
-    error: config.env === 'development' ? error.message : 'Serverda xatolik yuz berdi',
+/**
+ * 404 va xatolar — eng oxirida ro'yxatdan o'tishi kerak, shuning uchun
+ * webhook marshrutidan keyin qo'shiladi.
+ */
+function registerFallbacks() {
+  app.use((req, res) => {
+    res.status(404).json({ ok: false, error: `Yo'l topilmadi: ${req.originalUrl}` });
   });
-});
+
+  app.use((error, req, res, next) => {
+    console.error('❌ Server xatosi:', error);
+    res.status(error.status || 500).json({
+      ok: false,
+      error: config.env === 'development' ? error.message : 'Serverda xatolik yuz berdi',
+    });
+  });
+}
 
 /* ------------------------------ Ishga tushirish ------------------------------ */
 async function start() {
@@ -68,32 +87,56 @@ async function start() {
 
   await connectDatabase();
 
+  // Serverda (Render) Telegram xabarlarni shu manzilga yuboradi.
+  // Localhostda null qaytadi — u holda long polling ishlatiladi.
+  let webhook = null;
+  try {
+    webhook = await setupWebhook();
+    if (webhook) app.use(webhook);
+  } catch (error) {
+    console.error('⚠️  Webhook sozlanmadi:', error.message);
+  }
+
+  registerFallbacks();
+
   app.listen(config.port, () => {
-    console.log(`🚀 Server: http://localhost:${config.port}`);
+    console.log(`🚀 Server: ${config.deploy.publicUrl || `http://localhost:${config.port}`}`);
   });
 
   // Bot ishga tushmasa ham API va Admin Panel to'xtab qolmasligi kerak
   let botOk = true;
   try {
-    await launchBot();
+    await launchBot({ webhookReady: Boolean(webhook) });
   } catch {
     botOk = false; // sabab launchBot ichida katta blok bilan chiqarildi
   }
 
   console.log(`📱 Mini App: ${getWebAppUrl()}`);
-  console.log(`🖥  Admin Panel: http://localhost:5174  (parol: ${config.admin.password})`);
+
+  // Serverda bu maslahatlar keraksiz (u yerda .bat fayllar yo'q)
+  const onServer = Boolean(config.deploy.publicUrl);
+
+  if (!onServer) {
+    console.log(`🖥  Admin Panel: http://localhost:5174  (parol: ${config.admin.password})`);
+  }
+
   if (botOk) {
     console.log('\n✅ Hammasi tayyor!\n');
+  } else if (onServer) {
+    console.log('\n⚠️  API ishlayapti, lekin BOT ISHLAMAYAPTI — yuqoridagi xatolikka qarang.\n');
   } else {
     console.log('\n⚠️  Admin Panel ishlayapti, lekin BOT ISHLAMAYAPTI.');
     console.log('   Yuqoridagi xatolik matniga qarang.');
     console.log('   Batafsil tekshirish uchun: TEKSHIR.bat\n');
   }
-  console.log('   Loyiha papkasidagi yordamchi fayllar:');
-  console.log('     ADMIN.bat       — Admin Panelni brauzerda ochadi');
-  console.log('     SOZLAMALAR.bat  — bot tokeni / admin parolini almashtiradi');
-  console.log('     TEKSHIR.bat     — nima ishlamayotganini tekshiradi');
-  console.log('');
+
+  if (!onServer) {
+    console.log('   Loyiha papkasidagi yordamchi fayllar:');
+    console.log('     ADMIN.bat       — Admin Panelni brauzerda ochadi');
+    console.log('     SOZLAMALAR.bat  — bot tokeni / admin parolini almashtiradi');
+    console.log('     TEKSHIR.bat     — nima ishlamayotganini tekshiradi');
+    console.log('');
+  }
 }
 
 start().catch((error) => {

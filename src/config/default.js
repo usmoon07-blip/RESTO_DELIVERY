@@ -47,8 +47,27 @@ export const config = {
   },
 
   cors: {
-    // Localhostdagi Mini App va Admin Panel portlari
-    origins: true,
+    /**
+     * Ishlab chiqarishda faqat o'z saytlarimizga ruxsat beramiz.
+     * CORS_ORIGINS="https://a.vercel.app,https://b.vercel.app"
+     * Bo'sh bo'lsa (localhost) — hammasiga ruxsat.
+     */
+    origins: (process.env.CORS_ORIGINS || '')
+      .split(',')
+      .map((s) => s.trim().replace(/\/$/, ''))
+      .filter(Boolean),
+  },
+
+  deploy: {
+    /**
+     * Serverning o'z tashqi manzili. Render uni RENDER_EXTERNAL_URL
+     * o'zgaruvchisida o'zi beradi.
+     * Shu manzil bo'lsa — bot webhook rejimida ishlaydi (kompyuter kerak emas),
+     * bo'lmasa — long polling (localhost uchun).
+     */
+    publicUrl: (process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || '')
+      .trim()
+      .replace(/\/$/, ''),
   },
 };
 
