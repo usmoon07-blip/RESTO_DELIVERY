@@ -7,6 +7,7 @@ import config, { assertConfig } from './config/default.js';
 import { connectDatabase, disconnectDatabase } from './database/connection.js';
 import { launchBot } from './routes/bot.routes.js';
 import { getWebAppUrl } from './core/webapp.js';
+import { VERSION } from './core/version.js';
 import bot from './core/bot.js';
 import { UPLOAD_DIR } from './middlewares/upload.middleware.js';
 import clientRoutes from './routes/client.routes.js';
@@ -63,6 +64,8 @@ app.use((error, req, res, next) => {
 
 /* ------------------------------ Ishga tushirish ------------------------------ */
 async function start() {
+  console.log(`\n\ud83c\udf7d  Resto — versiya ${VERSION}\n`);
+
   await connectDatabase();
 
   app.listen(config.port, () => {

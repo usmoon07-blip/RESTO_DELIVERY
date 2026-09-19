@@ -4,6 +4,7 @@ import OrderModel from '../models/Order.js';
 import { formatPrice } from '../utils/format.js';
 import { LANGUAGES, LANGUAGE_NAMES, STATUS_MARK, t } from '../i18n/index.js';
 import { getWebAppUrl, isHttps } from '../core/webapp.js';
+import { VERSION } from '../core/version.js';
 
 const { restaurantName } = config.business;
 
@@ -55,7 +56,7 @@ async function sendWelcome(ctx, user) {
   // oddiy mijoz uni ko'rmaydi.
   const isAdmin = config.bot.adminIds.includes(String(ctx.from.id));
   if (isAdmin && !isHttps(getWebAppUrl())) {
-    await ctx.replyWithHTML(t(lang, 'devWarning'));
+    await ctx.replyWithHTML(`${t(lang, 'devWarning')}\n\n<code>v${VERSION}</code>`);
   }
 
   if (!user.phone) {
