@@ -107,7 +107,17 @@ npm run doctor
 Bu buyruq `.env`, baza, bot tokeni, tunnel va portlarni tekshirib,
 nima yetishmayotganini va nima qilish kerakligini aytadi.
 
-Admin Panel: http://localhost:5174 (parol — `.env` dagi `ADMIN_PASSWORD`)
+Admin Panel: http://localhost:5174 (parol — `.env` dagi `ADMIN_PASSWORD`, boshlang'ich: `admin123`)
+
+**Windows uchun yordamchi fayllar:**
+
+| Fayl | Vazifasi |
+|---|---|
+| `RESTO.bat` | Hammasini ishga tushiradi (yangilanishni ham o'zi oladi) |
+| `ADMIN.bat` | Admin Panelni brauzerda ochadi |
+| `SOZLAMALAR.bat` | Bot tokenini yoki admin parolini almashtiradi |
+
+> Terminal orqali: `npm run settings`
 
 Admin Panelda 4 ta bo'lim bor:
 

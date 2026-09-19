@@ -18,6 +18,7 @@
     "dev:miniapp": "npm --prefix miniapp run dev",
     "dev:admin": "npm --prefix admin run dev",
     "tunnel": "node scripts/tunnel.js",
+    "settings": "node scripts/settings.js",
     "doctor": "node scripts/doctor.js"
   },
   "prisma": {
