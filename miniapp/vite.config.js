@@ -5,6 +5,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    // Port band bo'lsa boshqasiga o'tib ketmasin — tunnel aynan shu
+    // portga qaraydi, port o'zgarsa Mini App ochilmay qoladi
+    strictPort: true,
     host: true,
     // ngrok orqali ochilganda Vite bloklamasligi uchun
     allowedHosts: true,

@@ -88,6 +88,13 @@ ishga tushiradi. Ekranda hammasining loglari rangli belgilar bilan ko'rinadi:
 
 To'xtatish: `Ctrl + C` (hammasi birga to'xtaydi).
 
+> **Eski oyna ochiq qolgan bo'lsa ham muammo yo'q** — `npm start` 5000, 5173
+> va 5174-portlarni tinglab turgan eski jarayonlarni o'zi to'xtatadi:
+>
+> ```
+> [PORT] 5173-port bo'shatildi (eski jarayon 1234 to'xtatildi)
+> ```
+
 > Alohida-alohida ishga tushirmoqchi bo'lsangiz:
 > `npm run dev` · `npm run dev:miniapp` · `npm run dev:admin` · `npm run tunnel`
 

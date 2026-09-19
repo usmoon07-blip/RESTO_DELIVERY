@@ -5,6 +5,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5174,
+    // Port band bo'lsa jimgina boshqasiga o'tib ketmasin — xatolik
+    // ko'rinib tursin
+    strictPort: true,
     host: true,
     proxy: {
       '/api': {
