@@ -35,12 +35,8 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
 
-      # Mini App manzili (Vercel) — bot tugmasi shu manzilni ochadi
-      - key: WEB_APP_URL
-        sync: false
-      # Mini App va Admin Panel manzillari, vergul bilan
-      - key: CORS_ORIGINS
-        sync: false
+      # WEB_APP_URL va CORS_ORIGINS bu yerda yo'q — ular Vercel manzillari
+      # tayyor bo'lgach, Render panelida qo'lda qo'shiladi (DEPLOY.md, 4-qadam).
 
       # Brauzerda initData tekshiruvisiz kirishga ruxsat bermaymiz
       - key: ALLOW_BROWSER_DEV
