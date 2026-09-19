@@ -65,7 +65,7 @@ export const config = {
   },
 
   business: {
-    restaurantName: process.env.RESTAURANT_NAME || 'Resto',
+    restaurantName: process.env.RESTAURANT_NAME || 'Resto Restaurant',
     currency: process.env.CURRENCY || "so'm",
     deliveryFee: toInt(process.env.DELIVERY_FEE, 15000),
     freeDeliveryFrom: toInt(process.env.FREE_DELIVERY_FROM, 150000),

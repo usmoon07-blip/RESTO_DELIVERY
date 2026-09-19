@@ -27,17 +27,18 @@ const DICT = {
     chooseLanguage: 'Tilni tanlang / Выберите язык / Choose a language',
     languageSet: "Til o'zbekchaga o'zgartirildi",
 
-    greeting: (name, restaurant) =>
+    greeting: (name, restaurant, hasApp) =>
       [
         `Assalomu alaykum, <b>${name}</b>!`,
         '',
-        `<b>${restaurant}</b> — turk va zamonaviy oshxona.`,
+        `<b>${restaurant}</b> rasmiy menyusiga xush kelibsiz.`,
+        '<i>Turk va zamonaviy oshxona</i>',
         '',
-        'Tandirda pishiriladi',
-        '45 daqiqada yetkazib berish',
-        "Naqd yoki karta orqali to'lov",
+        "Tandirda pishiriladi  ·  45 daqiqada yetkazamiz",
         '',
-        'Buyurtma berish uchun pastdagi tugmani bosing.',
+        hasApp
+          ? "Buyurtma berish uchun pastdagi <b>Buyurtma berish</b> tugmasini bosing."
+          : 'Menyu tez orada ochiladi.',
       ].join('\n'),
 
     btnOrder: 'Buyurtma berish',
@@ -151,17 +152,18 @@ const DICT = {
     chooseLanguage: 'Tilni tanlang / Выберите язык / Choose a language',
     languageSet: 'Язык изменён на русский',
 
-    greeting: (name, restaurant) =>
+    greeting: (name, restaurant, hasApp) =>
       [
         `Здравствуйте, <b>${name}</b>!`,
         '',
-        `<b>${restaurant}</b> — турецкая и современная кухня.`,
+        `Добро пожаловать в официальное меню <b>${restaurant}</b>.`,
+        '<i>Турецкая и современная кухня</i>',
         '',
-        'Готовим в тандыре',
-        'Доставка за 45 минут',
-        'Оплата наличными или картой',
+        'Готовим в тандыре  ·  Доставка за 45 минут',
         '',
-        'Нажмите кнопку ниже, чтобы сделать заказ.',
+        hasApp
+          ? 'Чтобы сделать заказ, нажмите кнопку <b>Сделать заказ</b> ниже.'
+          : 'Меню откроется совсем скоро.',
       ].join('\n'),
 
     btnOrder: 'Сделать заказ',
@@ -275,17 +277,18 @@ const DICT = {
     chooseLanguage: 'Tilni tanlang / Выберите язык / Choose a language',
     languageSet: 'Language changed to English',
 
-    greeting: (name, restaurant) =>
+    greeting: (name, restaurant, hasApp) =>
       [
         `Hello, <b>${name}</b>!`,
         '',
-        `<b>${restaurant}</b> — Turkish and modern cuisine.`,
+        `Welcome to the official menu of <b>${restaurant}</b>.`,
+        '<i>Turkish and modern cuisine</i>',
         '',
-        'Cooked in a tandoor',
-        'Delivery in 45 minutes',
-        'Pay by cash or card',
+        'Cooked in a tandoor  ·  Delivered in 45 minutes',
         '',
-        'Tap the button below to place an order.',
+        hasApp
+          ? 'Tap <b>Place an order</b> below to get started.'
+          : 'The menu will open shortly.',
       ].join('\n'),
 
     btnOrder: 'Place an order',

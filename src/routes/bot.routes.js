@@ -60,7 +60,7 @@ async function syncMenuButton() {
   try {
     if (isHttps(url)) {
       await bot.telegram.setChatMenuButton({
-        menuButton: { type: 'web_app', text: 'Menu', web_app: { url } },
+        menuButton: { type: 'web_app', text: 'Menyu', web_app: { url } },
       });
     } else {
       await bot.telegram.setChatMenuButton({ menuButton: { type: 'commands' } });

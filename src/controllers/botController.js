@@ -47,8 +47,12 @@ export function languageKeyboard() {
 async function sendWelcome(ctx, user) {
   const lang = user.language;
 
+  // Mini App tugmasi faqat https manzil bo'lganda chiqadi — matn ham
+  // shunga qarab yoziladi, bo'lmagan tugmani bosishga chaqirmaslik uchun
+  const hasApp = isHttps(getWebAppUrl());
+
   await ctx.replyWithHTML(
-    t(lang, 'greeting', user.firstName, restaurantName),
+    t(lang, 'greeting', user.firstName, restaurantName, hasApp),
     mainKeyboard(lang),
   );
 

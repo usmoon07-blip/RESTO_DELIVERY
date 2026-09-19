@@ -52,4 +52,4 @@ services:
       - key: FREE_DELIVERY_FROM
         value: "150000"
       - key: RESTAURANT_NAME
-        value: Resto
+        value: Resto Restaurant
