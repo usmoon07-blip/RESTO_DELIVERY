@@ -84,10 +84,11 @@ const DICT = {
     dataReceived: "Ma'lumot qabul qilindi.",
 
     devWarning:
-      '⚠️ <b>Diqqat (faqat dasturchi uchun):</b>\n\n' +
-      "Mini App tugmasi ko'rinishi uchun <code>.env</code> faylidagi " +
-      '<code>WEB_APP_URL</code> ga <b>ngrok</b> dan olingan <b>https://</b> manzilni yozing ' +
-      'va serverni qayta ishga tushiring.',
+      '<b>Eslatma (faqat siz ko\'rasiz):</b>\n\n' +
+      "Mini App tugmasi hali yo'q. Kompyuterda <b>ngrok</b> ni ishga tushiring:\n" +
+      '<code>ngrok http 5173</code>\n\n' +
+      "Bot uni o'zi topadi — hech narsani tahrirlash shart emas. " +
+      "So'ng /start ni qayta bosing.",
 
     orderAccepted: '<b>Buyurtmangiz muvaffaqiyatli qabul qilindi!</b>',
     orderCourier: "Kuryerimiz tez orada bog'lanadi",
@@ -194,10 +195,11 @@ const DICT = {
     dataReceived: 'Данные получены.',
 
     devWarning:
-      '⚠️ <b>Внимание (только для разработчика):</b>\n\n' +
-      'Чтобы появилась кнопка Mini App, укажите в файле <code>.env</code> ' +
-      'в <code>WEB_APP_URL</code> адрес <b>https://</b> из <b>ngrok</b> ' +
-      'и перезапустите сервер.',
+      '<b>Заметка (видите только вы):</b>\n\n' +
+      'Кнопки Mini App пока нет. Запустите на компьютере <b>ngrok</b>:\n' +
+      '<code>ngrok http 5173</code>\n\n' +
+      'Бот найдёт его сам — ничего редактировать не нужно. ' +
+      'Затем нажмите /start снова.',
 
     orderAccepted: '<b>Ваш заказ успешно принят!</b>',
     orderCourier: 'Наш курьер скоро свяжется с вами',
@@ -304,10 +306,11 @@ const DICT = {
     dataReceived: 'Data received.',
 
     devWarning:
-      '⚠️ <b>Note (for the developer only):</b>\n\n' +
-      'For the Mini App button to appear, set <code>WEB_APP_URL</code> in ' +
-      'your <code>.env</code> file to the <b>https://</b> address from <b>ngrok</b> ' +
-      'and restart the server.',
+      '<b>Note (only you can see this):</b>\n\n' +
+      'The Mini App button is not available yet. Start <b>ngrok</b> on your computer:\n' +
+      '<code>ngrok http 5173</code>\n\n' +
+      'The bot will find it automatically — nothing to edit. ' +
+      'Then press /start again.',
 
     orderAccepted: '<b>Your order has been accepted!</b>',
     orderCourier: 'Our courier will contact you shortly',

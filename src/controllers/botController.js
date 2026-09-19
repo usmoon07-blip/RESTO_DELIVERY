@@ -51,7 +51,10 @@ async function sendWelcome(ctx, user) {
     mainKeyboard(lang),
   );
 
-  if (!isHttps(getWebAppUrl())) {
+  // Bu eslatma faqat restoran egasiga (ADMIN_IDS) ko'rinadi —
+  // oddiy mijoz uni ko'rmaydi.
+  const isAdmin = config.bot.adminIds.includes(String(ctx.from.id));
+  if (isAdmin && !isHttps(getWebAppUrl())) {
     await ctx.replyWithHTML(t(lang, 'devWarning'));
   }
 
