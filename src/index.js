@@ -72,20 +72,27 @@ async function start() {
     console.log(`🚀 Server: http://localhost:${config.port}`);
   });
 
-  // Bot ishga tushmasa ham API to'xtab qolmasligi kerak
+  // Bot ishga tushmasa ham API va Admin Panel to'xtab qolmasligi kerak
+  let botOk = true;
   try {
     await launchBot();
-  } catch (error) {
-    console.error('⚠️  Bot ishga tushmadi:', error.message);
-    console.error('   BOT_TOKEN to\'g\'riligini va internet aloqasini tekshiring.');
+  } catch {
+    botOk = false; // sabab launchBot ichida katta blok bilan chiqarildi
   }
 
   console.log(`📱 Mini App: ${getWebAppUrl()}`);
   console.log(`🖥  Admin Panel: http://localhost:5174  (parol: ${config.admin.password})`);
-  console.log('\n✅ Hammasi tayyor!\n');
+  if (botOk) {
+    console.log('\n✅ Hammasi tayyor!\n');
+  } else {
+    console.log('\n⚠️  Admin Panel ishlayapti, lekin BOT ISHLAMAYAPTI.');
+    console.log('   Yuqoridagi xatolik matniga qarang.');
+    console.log('   Batafsil tekshirish uchun: TEKSHIR.bat\n');
+  }
   console.log('   Loyiha papkasidagi yordamchi fayllar:');
   console.log('     ADMIN.bat       — Admin Panelni brauzerda ochadi');
   console.log('     SOZLAMALAR.bat  — bot tokeni / admin parolini almashtiradi');
+  console.log('     TEKSHIR.bat     — nima ishlamayotganini tekshiradi');
   console.log('');
 }
 

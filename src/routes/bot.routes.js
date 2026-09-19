@@ -60,7 +60,7 @@ async function syncMenuButton() {
       await bot.telegram.setChatMenuButton({ menuButton: { type: 'commands' } });
     }
   } catch (error) {
-    console.warn('⚠️  Menyu tugmasi sozlanmadi:', error.message);
+    console.warn('⚠️  Menyu tugmasi sozlanmadi:', explainTelegramError(error)[0]);
   }
 }
 
@@ -87,6 +87,56 @@ export async function refreshWebAppUrl({ quiet = false } = {}) {
   return found;
 }
 
+/**
+ * Telegram xatoligini oddiy tilda tushuntiradi — terminalda nima qilish
+ * kerakligi darrov ko'rinsin.
+ */
+export function explainTelegramError(error) {
+  // Xatolik matnida to'liq URL, demak BOT_TOKEN ham bo'ladi — uni yashiramiz
+  const text = String(error?.message || error).replace(/bot\d+:[A-Za-z0-9_-]+/g, 'bot***');
+
+  if (/401|[Uu]nauthorized/.test(text)) {
+    return [
+      'BOT_TOKEN noto\'g\'ri — Telegram bu tokenni tanimadi.',
+      'SOZLAMALAR.bat ni oching, 1 ni tanlang va @BotFather dagi tokenni qayta joylang.',
+    ];
+  }
+
+  if (/404/.test(text)) {
+    return [
+      'Bunday bot topilmadi — token o\'chirilgan yoki bekor qilingan bo\'lishi mumkin.',
+      'BotFather da /mybots -> API Token orqali tokenni qayta oling.',
+    ];
+  }
+
+  if (/409|[Cc]onflict/.test(text)) {
+    return [
+      'Shu bot boshqa joyda ham ishlab turibdi (eski oyna yoki boshqa kompyuter).',
+      'Barcha qora oynalarni yoping va RESTO.bat ni qaytadan ishga tushiring.',
+    ];
+  }
+
+  if (/fetch failed|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|timeout|not valid JSON|Host not/.test(text)) {
+    return [
+      'Telegram serveriga ulanib bo\'lmadi — internet yoki bloklash muammosi.',
+      'Internetni tekshiring. Telegram bloklangan bo\'lsa VPN yoqing.',
+    ];
+  }
+
+  return [text, 'Muammo takrorlansa, shu matnni yuboring.'];
+}
+
+/** Ko'zga tashlanadigan xatolik bloki */
+function shout(title, lines) {
+  console.error('');
+  console.error('  ============================================');
+  console.error(`   ${title}`);
+  console.error('  ============================================');
+  for (const line of lines) console.error(`   ${line}`);
+  console.error('  ============================================');
+  console.error('');
+}
+
 /** Botni ishga tushirish (localhost uchun long polling) */
 export async function launchBot() {
   registerBotHandlers();
@@ -101,7 +151,7 @@ export async function launchBot() {
       { command: 'help', description: 'Help / Помощь / Yordam' },
     ]);
   } catch (error) {
-    console.warn('⚠️  Buyruqlar sozlanmadi:', error.message);
+    console.warn('⚠️  Buyruqlar sozlanmadi:', explainTelegramError(error)[0]);
   }
 
   // Tunnel keyinroq ishga tushsa ham bot o'zi ulanib oladi
@@ -112,11 +162,19 @@ export async function launchBot() {
   // `launch()` promise'i bot to'xtaguncha yopilmaydi — shuning uchun `await` qilmaymiz.
   // Xatolikni ushlamasak, butun server qulab tushadi.
   bot.launch({ dropPendingUpdates: true }).catch((error) => {
-    console.error("⚠️  Bot polling to'xtadi:", error.message);
+    shout('BOT XABARLARNI QABUL QILMAYAPTI', explainTelegramError(error));
   });
 
-  const me = await bot.telegram.getMe();
+  let me;
+  try {
+    me = await bot.telegram.getMe();
+  } catch (error) {
+    shout('BOT ISHGA TUSHMADI', explainTelegramError(error));
+    throw error;
+  }
+
   console.log(`🤖 Bot ishga tushdi: @${me.username}`);
+  console.log(`   Telegramda oching: https://t.me/${me.username}`);
 
   if (!isHttps(getWebAppUrl())) {
     console.log(
