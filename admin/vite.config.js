@@ -1,7 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // Serverda Admin Panel /admin manzilida turadi, shuning uchun qurilganda
+  // barcha fayl yo'llariga /admin/ qo'shiladi. Dev serverda (localhost:5174)
+  // hech narsa o'zgarmaydi.
+  base: command === 'build' ? '/admin/' : '/',
+
   plugins: [react()],
   server: {
     port: 5174,
@@ -20,4 +25,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

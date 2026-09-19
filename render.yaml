@@ -12,7 +12,9 @@ services:
     # db push jadvallarni yaratadi/yangilaydi. --accept-data-loss QO'YILMAGAN:
     # agar o'zgarish ma'lumot yo'qotishga olib kelsa, deploy to'xtaydi —
     # buyurtmalar jimgina o'chib ketmasligi uchun.
-    buildCommand: npm install && npx prisma generate && npx prisma db push --skip-generate
+    # --include=dev SHART: NODE_ENV=production bo'lgani uchun npm dev-paketlarni
+    # (prisma, vite) o'tkazib yuboradi va qurilish buziladi.
+    buildCommand: npm install --include=dev && npx prisma generate && npx prisma db push --skip-generate && npm run build:web
     startCommand: node src/index.js
 
     healthCheckPath: /api/health
@@ -35,8 +37,8 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
 
-      # WEB_APP_URL va CORS_ORIGINS bu yerda yo'q — ular Vercel manzillari
-      # tayyor bo'lgach, Render panelida qo'lda qo'shiladi (DEPLOY.md, 4-qadam).
+      # WEB_APP_URL va CORS_ORIGINS kerak emas: Mini App va Admin Panel
+      # shu serverning o'zida turadi (/ va /admin), demak bitta manzil.
 
       # Brauzerda initData tekshiruvisiz kirishga ruxsat bermaymiz
       - key: ALLOW_BROWSER_DEV

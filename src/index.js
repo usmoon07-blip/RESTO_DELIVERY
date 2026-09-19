@@ -10,6 +10,7 @@ import { getWebAppUrl } from './core/webapp.js';
 import { VERSION } from './core/version.js';
 import bot from './core/bot.js';
 import { UPLOAD_DIR } from './middlewares/upload.middleware.js';
+import { serveFrontends } from './core/static.js';
 import clientRoutes from './routes/client.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 
@@ -47,11 +48,11 @@ app.use(
 );
 
 /* ------------------------------- Routes ------------------------------- */
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.json({
     ok: true,
     name: `${config.business.restaurantName} API`,
-    version: '1.0.0',
+    version: VERSION,
     endpoints: ['/api/health', '/api/client/*', '/api/admin/*'],
   });
 });
@@ -95,6 +96,13 @@ async function start() {
     if (webhook) app.use(webhook);
   } catch (error) {
     console.error('⚠️  Webhook sozlanmadi:', error.message);
+  }
+
+  // Mini App va Admin Panel — shu serverning o'zidan (agar qurilgan bo'lsa)
+  const served = serveFrontends(app);
+  for (const p of served) {
+    const where = config.deploy.publicUrl || `http://localhost:${config.port}`;
+    console.log(`📦 ${p === '/' ? 'Mini App' : 'Admin Panel'}: ${where}${p === '/' ? '' : p}`);
   }
 
   registerFallbacks();

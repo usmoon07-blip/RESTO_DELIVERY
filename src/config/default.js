@@ -10,6 +10,25 @@ const toInt = (v, fallback = 0) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
+
+const publicUrl = (process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || '')
+  .trim()
+  .replace(/\/$/, '');
+
+/**
+ * Mini App manzili.
+ * Serverda Mini App shu serverning ildizida turadi, shuning uchun serverning
+ * o'z manzili olinadi — qo'lda hech narsa kiritish shart emas.
+ * WEB_APP_URL faqat haqiqiy https manzil bo'lsa ustunlik qiladi (masalan
+ * alohida hostingda turgan bo'lsa).
+ */
+function pickWebAppUrl() {
+  const given = (process.env.WEB_APP_URL || '').trim().replace(/\/$/, '');
+  if (/^https:\/\//i.test(given)) return given;
+  if (publicUrl) return publicUrl;
+  return given || 'http://localhost:5173';
+}
+
 export const config = {
   env: process.env.NODE_ENV || 'development',
   port: toInt(process.env.PORT, 5000),
@@ -20,7 +39,13 @@ export const config = {
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean),
-    webAppUrl: process.env.WEB_APP_URL || 'http://localhost:5173',
+    /**
+     * Mini App manzili.
+     * Serverda Mini App shu serverning ildizida turadi, shuning uchun
+     * WEB_APP_URL yozilmagan bo'lsa serverning o'z manzili olinadi —
+     * qo'lda hech narsa kiritish shart emas.
+     */
+    webAppUrl: pickWebAppUrl(),
     // Mini App qaysi portda turadi (tunnel manzilini topish uchun)
     webAppPort: toInt(process.env.WEB_APP_PORT, 5173),
     // Tunnel manzilini avtomatik topish (Cloudflare yoki ngrok).
@@ -65,9 +90,7 @@ export const config = {
      * Shu manzil bo'lsa — bot webhook rejimida ishlaydi (kompyuter kerak emas),
      * bo'lmasa — long polling (localhost uchun).
      */
-    publicUrl: (process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || '')
-      .trim()
-      .replace(/\/$/, ''),
+    publicUrl,
   },
 };
 

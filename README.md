@@ -4,7 +4,7 @@ Telegram bot, mijozlar uchun Mini App va ma'murlar uchun Admin Panel.
 Kompyuterda ham (`RESTO.bat`), serverda ham ishlaydi.
 
 > **Serverga yuklash:** [DEPLOY.md](DEPLOY.md) — qadamba-qadam qo'llanma
-> (backend Render'da, Mini App va Admin Panel Vercel'da, hammasi bepul).
+> (hammasi bitta Render xizmatida, bepul).
 
 | Qism | Texnologiya | Manzil |
 |---|---|---|

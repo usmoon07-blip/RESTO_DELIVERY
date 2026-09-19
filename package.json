@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start:prod": "node src/index.js",
+    "build:web": "npm --prefix miniapp install --include=dev --no-audit --no-fund && npm --prefix admin install --include=dev --no-audit --no-fund && npm --prefix miniapp run build && npm --prefix admin run build",
     "prestart": "node scripts/free-ports.js",
     "start": "concurrently -n \"BACKEND,MINIAPP,ADMIN,TUNNEL\" -c \"yellow,cyan,magenta,green\" \"npm:dev\" \"npm:dev:miniapp\" \"npm:dev:admin\" \"npm:tunnel\"",
     "db:push": "prisma db push",
