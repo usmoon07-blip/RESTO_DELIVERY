@@ -29,15 +29,15 @@ const DICT = {
 
     greeting: (name, restaurant, hasApp) =>
       [
-        `Assalomu alaykum, <b>${name}</b>!`,
+        `Assalomu alaykum, <b>${name}</b>.`,
         '',
-        `<b>${restaurant}</b> rasmiy menyusiga xush kelibsiz.`,
-        '<i>Turk va zamonaviy oshxona</i>',
+        `<b>${restaurant}</b> dasturxoniga xush kelibsiz.`,
         '',
-        "Tandirda pishiriladi  ·  45 daqiqada yetkazamiz",
+        'Har bir taom buyurtmadan keyin tayyorlanadi —',
+        "<i>tandirda, ochiq olovda, o'z vaqtida.</i>",
         '',
         hasApp
-          ? "Buyurtma berish uchun pastdagi <b>Buyurtma berish</b> tugmasini bosing."
+          ? 'Menyuni ochish uchun pastdagi tugmani bosing.'
           : 'Menyu tez orada ochiladi.',
       ].join('\n'),
 
@@ -154,15 +154,15 @@ const DICT = {
 
     greeting: (name, restaurant, hasApp) =>
       [
-        `Здравствуйте, <b>${name}</b>!`,
+        `Здравствуйте, <b>${name}</b>.`,
         '',
-        `Добро пожаловать в официальное меню <b>${restaurant}</b>.`,
-        '<i>Турецкая и современная кухня</i>',
+        `Добро пожаловать в <b>${restaurant}</b>.`,
         '',
-        'Готовим в тандыре  ·  Доставка за 45 минут',
+        'Каждое блюдо готовится после заказа —',
+        '<i>в тандыре, на открытом огне, точно ко времени.</i>',
         '',
         hasApp
-          ? 'Чтобы сделать заказ, нажмите кнопку <b>Сделать заказ</b> ниже.'
+          ? 'Чтобы открыть меню, нажмите кнопку ниже.'
           : 'Меню откроется совсем скоро.',
       ].join('\n'),
 
@@ -279,15 +279,15 @@ const DICT = {
 
     greeting: (name, restaurant, hasApp) =>
       [
-        `Hello, <b>${name}</b>!`,
+        `Hello, <b>${name}</b>.`,
         '',
-        `Welcome to the official menu of <b>${restaurant}</b>.`,
-        '<i>Turkish and modern cuisine</i>',
+        `Welcome to <b>${restaurant}</b>.`,
         '',
-        'Cooked in a tandoor  ·  Delivered in 45 minutes',
+        'Every dish is cooked to order —',
+        '<i>in the tandoor, over open fire, right on time.</i>',
         '',
         hasApp
-          ? 'Tap <b>Place an order</b> below to get started.'
+          ? 'Tap the button below to open the menu.'
           : 'The menu will open shortly.',
       ].join('\n'),
 
