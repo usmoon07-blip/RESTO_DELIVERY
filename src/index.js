@@ -81,7 +81,12 @@ async function start() {
   }
 
   console.log(`📱 Mini App: ${getWebAppUrl()}`);
+  console.log(`🖥  Admin Panel: http://localhost:5174  (parol: ${config.admin.password})`);
   console.log('\n✅ Hammasi tayyor!\n');
+  console.log('   Loyiha papkasidagi yordamchi fayllar:');
+  console.log('     ADMIN.bat       — Admin Panelni brauzerda ochadi');
+  console.log('     SOZLAMALAR.bat  — bot tokeni / admin parolini almashtiradi');
+  console.log('');
 }
 
 start().catch((error) => {
