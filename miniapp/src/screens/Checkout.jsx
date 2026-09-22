@@ -96,7 +96,9 @@ export default function Checkout({ onBack, onSuccess }) {
     setSending(true);
     try {
       await api.createOrder({
-        items: cart.map((i) => ({ productId: i.productId, qty: i.qty })),
+        // Nom ham yuboriladi: server uni bazadagi nom bilan solishtirib,
+        // savat eskirgan bo'lsa noto'g'ri taom o'tib ketishiga yo'l qo'ymaydi
+        items: cart.map((i) => ({ productId: i.productId, qty: i.qty, name: i.name })),
         deliveryType,
         paymentMethod,
         address: deliveryType === 'PICKUP' ? PICKUP_ADDRESS : text.trim(),

@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { productName } from '../i18n.js';
 import api from '../api.js';
+import snapshot from '../data/menu-snapshot.json';
 import { haptic, tgUser } from '../telegram.js';
 import { detectLang, makeT } from '../i18n.js';
 
@@ -39,8 +40,14 @@ export function AppProvider({ children }) {
   /** Savatchada saqlanadigan nom — joriy tilda */
   const productLabel = (product) => productName(product, langRef.current || 'UZ');
 
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  /**
+   * Menyu nusxasi ilova bilan birga keladi, shuning uchun taomlar
+   * server javob berishini kutmasdan darhol ko'rinadi. Server javob
+   * bergach ma'lumot jimgina yangilanadi.
+   */
+  const [products, setProducts] = useState(snapshot.products || []);
+  const [categories, setCategories] = useState(snapshot.categories || []);
+  const hasSnapshot = (snapshot.products || []).length > 0;
   const [promos, setPromos] = useState([]);
   const [appConfig, setAppConfig] = useState({
     restaurantName: 'Resto',
@@ -68,13 +75,14 @@ export function AppProvider({ children }) {
   });
   const [promo, setPromo] = useState(null); // { code, discount }
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!hasSnapshot);
   const [error, setError] = useState(null);
   const [toast, setToastState] = useState(null);
 
   /* ------------------------------- Yuklash ------------------------------- */
   const load = useCallback(async () => {
-    setLoading(true);
+    // Nusxa bor bo'lsa ekran allaqachon to'la — kutish ekrani chiqarmaymiz
+    if (!hasSnapshot) setLoading(true);
     setError(null);
     try {
       const [cfg, prods, cats] = await Promise.all([
@@ -103,11 +111,14 @@ export function AppProvider({ children }) {
         .catch(() => setProfile(null));
       api.getMyOrders().then(setOrders).catch(() => setOrders([]));
     } catch (e) {
-      setError(e.message);
+      // Nusxa ko'rinib turgan bo'lsa, mijozga xatolik ko'rsatmaymiz —
+      // u menyuni ko'rayotgan bo'ladi, biz esa fonda qayta urinamiz.
+      if (!hasSnapshot) setError(e.message);
+      else console.warn('Server javob bermadi, menyu nusxasi ko\'rsatilmoqda:', e.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [hasSnapshot]);
 
   useEffect(() => {
     load();

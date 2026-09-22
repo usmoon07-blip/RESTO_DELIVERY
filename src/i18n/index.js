@@ -134,6 +134,7 @@ const DICT = {
     payment: { CASH: 'Naqd pul', CARD: 'Karta orqali' },
 
     errAuth: 'Avtorizatsiya xatosi. Ilovani Telegram orqali oching.',
+    errMenuChanged: "Menyu yangilandi. Iltimos, ilovani yopib qayta oching va savatni to'ldiring.",
     errCartEmpty: "Savat bo'sh",
     errDeliveryType: "Yetkazish turi noto'g'ri",
     errPaymentType: "To'lov turi noto'g'ri",
@@ -259,6 +260,7 @@ const DICT = {
     payment: { CASH: 'Наличные', CARD: 'Картой' },
 
     errAuth: 'Ошибка авторизации. Откройте приложение через Telegram.',
+    errMenuChanged: 'Меню обновилось. Пожалуйста, закройте и снова откройте приложение и соберите корзину заново.',
     errCartEmpty: 'Корзина пуста',
     errDeliveryType: 'Неверный тип доставки',
     errPaymentType: 'Неверный тип оплаты',
@@ -384,6 +386,7 @@ const DICT = {
     payment: { CASH: 'Cash', CARD: 'Card' },
 
     errAuth: 'Authorization error. Please open the app from Telegram.',
+    errMenuChanged: 'The menu has been updated. Please reopen the app and fill your cart again.',
     errCartEmpty: 'Your cart is empty',
     errDeliveryType: 'Invalid delivery type',
     errPaymentType: 'Invalid payment type',

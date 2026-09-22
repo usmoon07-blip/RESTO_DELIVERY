@@ -235,6 +235,19 @@ export async function createOrder(req, res, next) {
       const product = productMap.get(Number(item.productId));
       if (!product || !product.isActive) continue;
 
+      /**
+       * Savat eskirgan bo'lishi mumkin (ilova menyu nusxasi bilan ochilgan
+       * yoki mahsulot o'chirilgan). Mijoz yuborgan nom bazadagi nomlarning
+       * birortasiga ham mos kelmasa — buyurtmani qabul qilmaymiz, aks holda
+       * mijoz boshqa taom olib qolishi mumkin.
+       */
+      if (item.name) {
+        const known = [product.name, product.nameUz, product.nameEn].filter(Boolean);
+        if (!known.includes(String(item.name))) {
+          return res.status(409).json({ ok: false, error: t(lang, 'errMenuChanged') });
+        }
+      }
+
       const qty = Math.max(1, Math.min(50, Number(item.qty) || 1));
       const lineTotal = product.newPrice * qty;
       subtotal += lineTotal;
