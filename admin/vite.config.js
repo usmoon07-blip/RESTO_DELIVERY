@@ -2,10 +2,15 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ command }) => ({
-  // Serverda Admin Panel /admin manzilida turadi, shuning uchun qurilganda
-  // barcha fayl yo'llariga /admin/ qo'shiladi. Dev serverda (localhost:5174)
-  // hech narsa o'zgarmaydi.
-  base: command === 'build' ? '/admin/' : '/',
+  /**
+   * Admin Panel ikki joyda turishi mumkin:
+   *   Render'da  -> https://.../admin   (shuning uchun base=/admin/)
+   *   Vercel'da  -> ildizda             (base=/)
+   * Vercel qurilish paytida VERCEL o'zgaruvchisini o'zi qo'yadi,
+   * shuning uchun qo'lda hech narsa sozlash kerak emas.
+   * Dev serverda (localhost:5174) ham ildizda.
+   */
+  base: process.env.VERCEL ? '/' : command === 'build' ? '/admin/' : '/',
 
   plugins: [react()],
   server: {

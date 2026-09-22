@@ -60,13 +60,29 @@ kompyuterda ham ishga tushirmang — bitta botni ikki joydan tinglab bo'lmaydi.
 
 ---
 
-## Alohida hostingda turg'izmoqchi bo'lsangiz
+## Frontendni Vercel'ga chiqarish (ixtiyoriy)
 
-Mini App yoki Admin Panelni Vercel kabi joyda turg'izish ham mumkin —
-kod buni qo'llab-quvvatlaydi:
+Sahifa tezroq ochilsin desangiz, Mini App va Admin Panelni Vercel'da
+turg'izish mumkin. Backend Render'da qoladi.
 
-- Frontendni qurganda `VITE_API_URL` ni Render manzili + `/api` qiling
-- Render'da `CORS_ORIGINS` ga o'sha saytlar manzilini yozing
-- Mini App alohida tursa, `WEB_APP_URL` ga uning manzilini yozing
+**Vercel'da ikkita loyiha** (https://vercel.com/new → RESTO_DELIVERY → Import):
 
-Lekin bitta serverda ushlab turish soddaroq va xatolik kamroq bo'ladi.
+| | Mini App | Admin Panel |
+|---|---|---|
+| Project Name | `resto-mini` | `resto-admin` |
+| Root Directory | `miniapp` | `admin` |
+| `VITE_API_URL` | `https://<render>.onrender.com/api` | `https://<render>.onrender.com/api` |
+
+**Render'da ikkita o'zgaruvchi** (Environment → Add):
+
+| Nomi | Qiymati |
+|---|---|
+| `WEB_APP_URL` | `https://resto-mini.vercel.app` |
+| `CORS_ORIGINS` | `https://resto-mini.vercel.app,https://resto-admin.vercel.app` |
+
+Admin Panel Vercel'da ildizda, Render'da esa `/admin` da turadi — kod buni
+`VERCEL` o'zgaruvchisi orqali o'zi ajratadi, qo'lda sozlash kerak emas.
+
+> **Diqqat:** Vercel faqat sahifani tezlashtiradi. Menyu ma'lumoti baribir
+> Render'dan keladi, shuning uchun Render uxlab qolgan bo'lsa kutish saqlanadi.
+> Asl yechim — yuqoridagi 1-band (uxlatmaslik).
