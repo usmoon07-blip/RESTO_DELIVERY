@@ -11,6 +11,7 @@ import { VERSION } from './core/version.js';
 import bot from './core/bot.js';
 import { UPLOAD_DIR } from './middlewares/upload.middleware.js';
 import { serveFrontends } from './core/static.js';
+import { startKeepAwake } from './core/keep-awake.js';
 import clientRoutes from './routes/client.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 
@@ -109,6 +110,8 @@ async function start() {
 
   app.listen(config.port, () => {
     console.log(`🚀 Server: ${config.deploy.publicUrl || `http://localhost:${config.port}`}`);
+    // Serverda o'zini uyg'oq ushlaydi; localhostda hech narsa qilmaydi
+    startKeepAwake();
   });
 
   // Bot ishga tushmasa ham API va Admin Panel to'xtab qolmasligi kerak

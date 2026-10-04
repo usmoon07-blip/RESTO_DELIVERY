@@ -116,21 +116,30 @@ if (item.name) {
 
 ### B. Serverni uxlatmaslik
 
-GitHub Actions har 10 daqiqada turtki beradi — tashqi xizmatga ro'yxatdan
-o'tish kerak emas:
+**GitHub Actions jadvali bunga YARAMAYDI.** O'lchab ko'rildi: `*/10` cron
+yozilgan bo'lsa ham, haqiqatda o'rtacha **63 daqiqada** bir ishga tushadi,
+eng uzun tanaffus **7.6 soat**. 29 tanaffusdan 19 tasi 15 daqiqadan uzun —
+server ko'p vaqt uxlab yotadi. Faqat unga suyanmang.
 
-```yaml
-on:
-  schedule:
-    - cron: '*/10 4-21 * * *'   # UTC 04-21 = Toshkent 09:00-02:00
+**Ishlaydigan yechim: server o'zini o'zi uyg'otadi.** O'z tashqi manziliga
+har 10 daqiqada so'rov yuboradi; Render buni oddiy kiruvchi so'rov deb
+biladi va uxlash hisoblagichini qayta boshlaydi.
+
+```js
+if (!base) return false;              // localhostda kerak emas
+const url = `${base}/api/health`;
+setInterval(ping, 10 * 60 * 1000).unref();   // uxlash chegarasi 15 daqiqa
 ```
 
 **Faqat ish vaqtida** — bepul Render'da oyiga 750 soat chegara bor.
-18 soat × 30 kun = 540 soat, sig'adi. Sutka bo'yi ursangiz 730 soat
-bo'ladi va chegaraga juda yaqinlashadi.
+18 soat × 30 kun = 540 soat, sig'adi. Sutka bo'yi ushlasangiz 730 soat
+bo'ladi va chegaraga tegib ketasiz.
+
+GitHub Actions turtkisi baribir foydali, lekin boshqa vazifada: server
+baribir uxlab qolsa (deploy, uzilish), uni **uyg'otadi** — chunki uxlagan
+server o'zini o'zi uyg'ota olmaydi.
 
 > GitHub 60 kun faoliyatsiz omborda jadvalli ishlarni o'chirib qo'yadi.
-> Vaqti-vaqti bilan commit bo'lsa muammo yo'q.
 
 ---
 
@@ -181,3 +190,9 @@ ish jarayoni, lekin mijozni cho'chitadi.
 
 > **Eng ko'p uchraydigan xato:** Vercel'da Root Directory ni belgilashni
 > unutish. Unda ombor ildizi qurilib, noto'g'ri narsa chiqadi.
+
+> **Ikkinchi eng ko'p uchraydigan xato:** `WEB_APP_URL` ni Vercel manziliga
+> o'tkazishni unutish. Unda bot Mini App'ni **Render'dan** ochadi va menyu
+> nusxasi hech narsa bermaydi — sahifaning o'zi uxlab yotgan serverdan
+> kelgani uchun umuman yuklanmaydi. Nusxa faqat sahifa Vercel'dan
+> kelganda ishlaydi.
