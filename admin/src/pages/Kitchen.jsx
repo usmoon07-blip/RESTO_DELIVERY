@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../api.js';
 import { enableSound, isSoundEnabled, playNewOrderSound } from '../sound.js';
-import { DELIVERY_LABELS, PAYMENT_LABELS, formatSum } from '../utils.js';
+import {
+  DELIVERY_LABELS,
+  PAYMENT_LABELS,
+  copyText,
+  courierNote,
+  formatSum,
+  yandexUrl,
+} from '../utils.js';
 
 const REFRESH_MS = 3000;
 
@@ -40,6 +47,7 @@ function timeOnly(date) {
 }
 
 function OrderCard({ order, column, isNew, onAdvance, onCancel, busy }) {
+  const [copied, setCopied] = useState(false);
   const minutes = minutesSince(order.createdAt);
   const urgency = minutes >= 25 ? 'late' : minutes >= 15 ? 'warn' : 'ok';
 
@@ -95,8 +103,36 @@ function OrderCard({ order, column, isNew, onAdvance, onCancel, busy }) {
           <b>{order.user?.firstName}</b>{' '}
           <a href={`tel:${order.phone}`}>{order.phone}</a>
         </div>
-        {order.deliveryType === 'DELIVERY' && order.address && (
-          <div className="kds-address">{order.address}</div>
+        {order.deliveryType === 'DELIVERY' && (order.address || order.latitude != null) && (
+          <>
+            {order.address && <div className="kds-address">{order.address}</div>}
+
+            {/* Kuryerni jo'natish: xaritani ochish yoki havolani nusxalash */}
+            <div className="kds-nav">
+              {yandexUrl(order) && (
+                <a
+                  className="kds-nav__link"
+                  href={yandexUrl(order)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Yandex xaritada
+                  {order.latitude != null && <span className="kds-nav__exact">aniq nuqta</span>}
+                </a>
+              )}
+              <button
+                type="button"
+                className="kds-nav__copy"
+                onClick={async () => {
+                  const ok = await copyText(courierNote(order));
+                  setCopied(ok);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+              >
+                {copied ? 'Nusxalandi' : 'Kuryerga nusxalash'}
+              </button>
+            </div>
+          </>
         )}
         <div className="kds-total">{formatSum(order.total)} so'm</div>
       </div>

@@ -6,6 +6,7 @@ import {
   STATUS_LABELS,
   formatDate,
   formatSum,
+  yandexUrl,
 } from '../utils.js';
 
 const STATUSES = Object.keys(STATUS_LABELS);
@@ -186,14 +187,15 @@ export default function Orders({ onAuthError }) {
                   <td>
                     <div>{DELIVERY_LABELS[order.deliveryType]}</div>
                     <div className="cell-muted">{order.address || '—'}</div>
-                    {order.latitude != null && (
+                    {yandexUrl(order) && (
                       <a
                         className="cell-muted"
-                        href={`https://maps.google.com/?q=${order.latitude},${order.longitude}`}
+                        href={yandexUrl(order)}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Xaritada ochish
+                        Yandex xaritada
+                        {order.latitude != null ? ' (aniq nuqta)' : ''}
                       </a>
                     )}
                   </td>

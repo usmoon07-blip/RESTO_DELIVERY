@@ -1254,3 +1254,46 @@ textarea.input {
     font-size: 19px;
   }
 }
+
+/* ---- Oshxona: kuryerni jo'natish ---- */
+.kds-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.kds-nav__link,
+.kds-nav__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.kds-nav__link:hover,
+.kds-nav__copy:hover {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+
+/* Aniq koordinata borligini bildiradi — manzil matnidan ishonchliroq */
+.kds-nav__exact {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #e8f3ec;
+  color: #2f6b47;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}

@@ -175,6 +175,12 @@ Yangi buyurtmalar  →  Tayyorlanmoqda  →  Yo'lda / Olib ketishga tayyor  → 
 - **To'liq ekran:** planshet yoki devordagi monitor uchun.
 - **Taymer:** buyurtma tushganidan beri o'tgan vaqt. 15 daqiqadan keyin
   sariq, 25 daqiqadan keyin qizil.
+- **Yandex xaritada** — kuryerni jo'natish uchun. Mijoz joylashuvini
+  belgilagan bo'lsa yashil «aniq nuqta» belgisi chiqadi va havola
+  to'g'ridan-to'g'ri o'sha nuqtaga yo'nalish quradi; aks holda manzil
+  matni bo'yicha qidiriladi.
+- **Kuryerga nusxalash** — buyurtma raqami, telefon, manzil, summa va
+  xarita havolasi bitta matnga yig'iladi. Telegramga tashlasa bo'ladi.
 - Har bir tugma bosilganda **bot mijozga avtomatik xabar yuboradi**.
 - Yakunlangan va bekor qilingan buyurtmalar ekrandan o'zi yo'qoladi.
 
